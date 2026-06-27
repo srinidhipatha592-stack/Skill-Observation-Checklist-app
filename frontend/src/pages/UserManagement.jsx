@@ -21,7 +21,8 @@ function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/users/");
+      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${API_BASE}/api/users/`);
 
       const data = await response.json();
 
@@ -52,7 +53,8 @@ function UserManagement() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/users/", {
+      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${API_BASE}/api/users/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,8 +89,9 @@ function UserManagement() {
 
   const updateUser = async () => {
     try {
+      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
       const response = await fetch(
-        `http://127.0.0.1:8000/api/users/${editingUserId}`,
+        `${API_BASE}/api/users/${editingUserId}`,
         {
           method: "PUT",
           headers: {
@@ -143,8 +146,9 @@ function UserManagement() {
     }
 
     try {
+      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
       const response = await fetch(
-        `http://127.0.0.1:8000/api/users/${userId}`,
+        `${API_BASE}/api/users/${userId}`,
         {
           method: "DELETE",
         },
