@@ -11,7 +11,7 @@ export default function AdminApprovals() {
   const fetchPendingTeachers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/admin/pending-teachers");
+      const res = await axios.get("/api/admin/teachers/pending");
       setPendingTeachers(res.data);
     } catch (err) {
       setError("Failed to load pending teachers");
