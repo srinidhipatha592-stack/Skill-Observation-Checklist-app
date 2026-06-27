@@ -7,6 +7,9 @@ class RegisterRequest(BaseModel):
     username: str | None = None
     password: str
     role: str
+    school_name: str | None = None
+    employee_id: str | None = None
+    qualification: str | None = None
 
 
 class LoginRequest(BaseModel):

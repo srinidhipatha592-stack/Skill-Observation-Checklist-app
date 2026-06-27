@@ -58,3 +58,16 @@ class User(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+    # Teacher specific fields
+    school_name = Column(String, nullable=True)
+    employee_id = Column(String, nullable=True)
+    qualification = Column(String, nullable=True)
+
+    # Status control (pending, active, suspended)
+    status = Column(String, default="active")
+
+    # Soft delete fields
+    deleted = Column(Boolean, default=False)
+    deleted_by = Column(UUID(as_uuid=True), nullable=True)
+    deleted_at = Column(DateTime, nullable=True)

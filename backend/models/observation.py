@@ -5,6 +5,7 @@ from sqlalchemy import String
 from sqlalchemy import Integer
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
+from sqlalchemy import Boolean
 
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -53,3 +54,14 @@ class Observation(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+    created_by = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False
+    )
+
+    # Soft delete fields
+    deleted = Column(Boolean, default=False)
+    deleted_by = Column(UUID(as_uuid=True), nullable=True)
+    deleted_at = Column(DateTime, nullable=True)

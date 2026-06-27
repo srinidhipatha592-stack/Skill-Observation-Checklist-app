@@ -34,9 +34,12 @@ router = APIRouter(
 security = HTTPBearer()
 
 
+from fastapi import Request
+
 @router.post("/register")
 def register(
     payload: RegisterRequest,
+    request: Request,
     db: Session = Depends(get_db)
 ):
 
@@ -75,20 +78,24 @@ def register(
             payload.password
         ),
         role=payload.role,
-        is_active=True
+        is_active=True,
+        school_name=payload.school_name,
+        employee_id=payload.employee_id,
+        qualification=payload.qualification,
+        status="pending" if payload.role == "teacher" else "active"
     )
 
     db.add(user)
-
     db.commit()
-
     db.refresh(user)
 
     log_activity(
         db=db,
-        user_email=user.email,
+        user_id=str(user.id),
+        role=user.role,
         action="User Registered",
-        module="Authentication"
+        module="Authentication",
+        request=request
     )
 
     return {
@@ -100,6 +107,7 @@ def register(
 @router.post("/login")
 def login(
     payload: LoginRequest,
+    request: Request,
     db: Session = Depends(get_db)
 ):
 
@@ -108,24 +116,33 @@ def login(
     ).first()
 
     if not user:
-
         raise HTTPException(
             status_code=401,
             detail="Invalid Email/Username or Password."
         )
 
-    if user.is_active is False:
-
+    if user.is_active is False or user.deleted:
         raise HTTPException(
             status_code=403,
             detail="Account is deactivated"
+        )
+        
+    if user.status == "pending":
+        raise HTTPException(
+            status_code=403,
+            detail="Account awaiting administrator approval"
+        )
+        
+    if user.status == "suspended":
+        raise HTTPException(
+            status_code=403,
+            detail="Account is suspended"
         )
 
     if not verify_password(
         payload.password,
         user.password_hash
     ):
-
         raise HTTPException(
             status_code=401,
             detail="Invalid Email/Username or Password."
@@ -141,9 +158,11 @@ def login(
 
     log_activity(
         db=db,
-        user_email=user.email,
+        user_id=str(user.id),
+        role=user.role,
         action="User Login",
-        module="Authentication"
+        module="Authentication",
+        request=request
     )
 
     return {

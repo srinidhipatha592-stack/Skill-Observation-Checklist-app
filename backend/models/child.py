@@ -4,6 +4,8 @@ from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy import Integer
 from sqlalchemy import Date
+from sqlalchemy import Boolean
+from sqlalchemy import DateTime
 
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -39,3 +41,8 @@ class Child(Base):
     allergies = Column(String)
 
     medical_notes = Column(String)
+
+    # Soft delete fields
+    deleted = Column(Boolean, default=False)
+    deleted_by = Column(UUID(as_uuid=True), nullable=True)
+    deleted_at = Column(DateTime, nullable=True)

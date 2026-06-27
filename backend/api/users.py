@@ -1,191 +1,130 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
-
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 from core.database import get_db
-
+from core.security import verify_access_token, hash_password
 from models.user import User
-
 from schemas.user import CreateUserRequest
-
-from core.security import hash_password
-
-from services.activity_log_service import (
-    log_activity
-)
+from services.activity_log_service import log_activity
 
 router = APIRouter(
     prefix="/api/users",
     tags=["Users"]
 )
 
+security = HTTPBearer()
+
+def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    token = credentials.credentials
+    payload = verify_access_token(token)
+    if not payload or payload.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    user = db.query(User).filter(User.id == payload.get("sub"), User.is_active == True, User.deleted == False).first()
+    if not user:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
 
 @router.get("/")
-def get_users(
-    db: Session = Depends(get_db)
-):
-
-    users = db.query(User).filter(
-        User.is_active == True
-    ).all()
-
+def get_users(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    users = db.query(User).filter(User.deleted == False).all()
     return [
-
         {
             "id": str(user.id),
             "name": user.name,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
+            "status": user.status,
+            "is_active": user.is_active
         }
-
         for user in users
-
     ]
-
 
 @router.post("/")
 def create_user(
-
     payload: CreateUserRequest,
-
+    request: Request,
+    admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
-
 ):
-
-    existing_user = db.query(User).filter(
-        User.email == payload.email
-    ).first()
-
+    existing_user = db.query(User).filter(User.email == payload.email).first()
     if existing_user:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Email already exists"
-        )
+        raise HTTPException(status_code=400, detail="Email already exists")
 
     user = User(
-
         name=payload.name,
-
         email=payload.email,
-
-        password_hash=hash_password(
-            payload.password
-        ),
-
+        password_hash=hash_password(payload.password),
         role=payload.role,
-
-        is_active=True
-
+        is_active=True,
+        status="active"
     )
 
     db.add(user)
-
     db.commit()
-
     db.refresh(user)
 
     log_activity(
-        db=db,
-        user_email=user.email,
-        action="User Created",
-        module="User Management"
+        db=db, user_id=str(admin.id), role=admin.role,
+        action="User Created", module="User Management", request=request
     )
 
-    return {
-        "message":
-        "User created successfully"
-    }
-
+    return {"message": "User created successfully"}
 
 @router.put("/{user_id}")
 def update_user(
-
     user_id: str,
-
     payload: CreateUserRequest,
-
+    request: Request,
+    admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
-
 ):
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
-
+    user = db.query(User).filter(User.id == user_id, User.deleted == False).first()
     if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    existing_user = db.query(User).filter(
-        User.email == payload.email,
-        User.id != user_id
-    ).first()
-
+    existing_user = db.query(User).filter(User.email == payload.email, User.id != user_id).first()
     if existing_user:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Email already exists"
-        )
+        raise HTTPException(status_code=400, detail="Email already exists")
 
     user.name = payload.name
-
     user.email = payload.email
-
     user.role = payload.role
+    if payload.password: # Only hash if provided
+        user.password_hash = hash_password(payload.password)
 
     db.commit()
-
     db.refresh(user)
 
     log_activity(
-        db=db,
-        user_email=user.email,
-        action="User Updated",
-        module="User Management"
+        db=db, user_id=str(admin.id), role=admin.role,
+        action="User Updated", module="User Management", request=request
     )
 
-    return {
-        "message":
-        "User updated successfully"
-    }
+    return {"message": "User updated successfully"}
 
 
 @router.delete("/{user_id}")
 def delete_user(
     user_id: str,
+    request: Request,
+    admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
-
+    user = db.query(User).filter(User.id == user_id, User.deleted == False).first()
     if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    user.is_active = False
-
+    user.deleted = True
+    user.deleted_by = admin.id
+    user.deleted_at = datetime.utcnow()
+    user.is_active = False # Deactivate as well
     db.commit()
 
     log_activity(
-        db=db,
-        user_email=user.email,
-        action="User Deleted",
-        module="User Management"
+        db=db, user_id=str(admin.id), role=admin.role,
+        action="User Deleted", module="User Management", request=request
     )
 
-    return {
-        "message":
-        "User deactivated successfully"
-    }
+    return {"message": "User deactivated successfully"}
