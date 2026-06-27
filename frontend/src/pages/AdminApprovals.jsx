@@ -11,8 +11,12 @@ export default function AdminApprovals() {
   const fetchPendingTeachers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/admin/teachers/pending");
+      const token = localStorage.getItem("access_token");
+      const res = await axios.get("/api/admin/teachers/pending", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setPendingTeachers(res.data);
+      setError("");
     } catch (err) {
       setError("Failed to load pending teachers");
       console.error(err);
@@ -27,7 +31,10 @@ export default function AdminApprovals() {
 
   const handleApprove = async (userId) => {
     try {
-      await axios.put(`/api/admin/teachers/${userId}/approval`, { action: "approve" });
+      const token = localStorage.getItem("access_token");
+      await axios.put(`/api/admin/teachers/${userId}/approval`, { action: "approve" }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchPendingTeachers();
     } catch (err) {
       alert("Failed to approve teacher");
@@ -37,7 +44,10 @@ export default function AdminApprovals() {
   const handleReject = async (userId) => {
     if (!window.confirm("Are you sure you want to reject this teacher application?")) return;
     try {
-      await axios.put(`/api/admin/teachers/${userId}/approval`, { action: "reject" });
+      const token = localStorage.getItem("access_token");
+      await axios.put(`/api/admin/teachers/${userId}/approval`, { action: "reject" }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchPendingTeachers();
     } catch (err) {
       alert("Failed to reject teacher");
@@ -62,7 +72,7 @@ export default function AdminApprovals() {
 
         {loading ? (
           <p>Loading...</p>
-        ) : pendingTeachers.length === 0 ? (
+        ) : error ? null : pendingTeachers.length === 0 ? (
           <div style={styles.emptyState}>
             <p>No pending teacher approvals at this time.</p>
           </div>
