@@ -182,7 +182,8 @@ function App() {
             <RoleProtectedRoute
               allowedRoles={[
                 "admin",
-                "teacher"
+                "teacher",
+                "parent"
               ]}
             >
               <Reports />
