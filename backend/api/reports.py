@@ -43,7 +43,7 @@ def reports_summary(
 
         average_rating = round(
             sum(
-                obs.rating
+                float(obs.rating)
                 for obs in observations
             ) / total_observations,
             2
@@ -77,12 +77,12 @@ def reports_summary(
 
         highest_skill = max(
             skill_averages,
-            key=skill_averages.get
+            key=lambda k: skill_averages[k]
         )
 
         lowest_skill = min(
             skill_averages,
-            key=skill_averages.get
+            key=lambda k: skill_averages[k]
         )
 
     recent_observations = [

@@ -8,7 +8,7 @@ def log_activity(
     role: str,
     action: str,
     module: str,
-    request: Request = None
+    request: Request | None = None
 ):
     ip_address = None
     device = None

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.database import get_db
 from core.security import verify_access_token
@@ -57,7 +57,7 @@ def create_observation(
     teacher_id = payload.teacher_id if user.role == "admin" else user.id
 
     observation = Observation(
-        **payload.dict(exclude={"teacher_id"}),
+        **payload.model_dump(exclude={"teacher_id"}),
         teacher_id=teacher_id,
         created_by=user.id
     )
@@ -67,7 +67,7 @@ def create_observation(
     db.refresh(observation)
 
     log_activity(
-        db=db, user_id=str(user.id), role=user.role,
+        db=db, user_id=str(user.id), role=str(user.role),
         action="Created Observation", module="Observations", request=request
     )
 
@@ -243,7 +243,7 @@ def update_observation(
     db.refresh(observation)
 
     log_activity(
-        db=db, user_id=str(user.id), role=user.role,
+        db=db, user_id=str(user.id), role=str(user.role),
         action="Updated Observation", module="Observations", request=request
     )
 
@@ -276,11 +276,11 @@ def delete_observation(
     # Soft Delete
     observation.deleted = True
     observation.deleted_by = user.id
-    observation.deleted_at = datetime.utcnow()
+    observation.deleted_at = datetime.now(timezone.utc)
     db.commit()
 
     log_activity(
-        db=db, user_id=str(user.id), role=user.role,
+        db=db, user_id=str(user.id), role=str(user.role),
         action="Deleted Observation", module="Observations", request=request
     )
 

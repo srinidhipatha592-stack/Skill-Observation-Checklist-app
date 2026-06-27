@@ -26,7 +26,7 @@ def create_milestone(
 ):
 
     milestone = Milestone(
-        **payload.dict()
+        **payload.model_dump()
     )
 
     db.add(milestone)

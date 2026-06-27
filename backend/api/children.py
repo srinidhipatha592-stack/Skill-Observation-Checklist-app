@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.database import get_db
 from core.security import verify_access_token
@@ -40,13 +40,21 @@ def create_child(
     if user.role not in ["admin", "teacher"]:
         raise HTTPException(status_code=403, detail="Not authorized to create children")
 
-    child = Child(**payload.dict())
+    child = Child(**payload.model_dump())
     db.add(child)
     db.commit()
     db.refresh(child)
 
+    if user.role == "teacher":
+        assignment = TeacherStudentAssignment(
+            teacher_id=user.id,
+            child_id=child.id
+        )
+        db.add(assignment)
+        db.commit()
+
     log_activity(
-        db=db, user_id=str(user.id), role=user.role,
+        db=db, user_id=str(user.id), role=str(user.role),
         action="Created Child", module="Children", request=request
     )
     return child
@@ -120,14 +128,14 @@ def update_child(
         if not assignment:
             raise HTTPException(status_code=403, detail="Not assigned to this student")
 
-    for key, value in payload.dict(exclude_unset=True).items():
+    for key, value in payload.model_dump(exclude_unset=True).items():
         setattr(child, key, value)
 
     db.commit()
     db.refresh(child)
 
     log_activity(
-        db=db, user_id=str(user.id), role=user.role,
+        db=db, user_id=str(user.id), role=str(user.role),
         action="Updated Child", module="Children", request=request
     )
     return child
@@ -150,11 +158,11 @@ def delete_child(
     # Soft Delete
     child.deleted = True
     child.deleted_by = user.id
-    child.deleted_at = datetime.utcnow()
+    child.deleted_at = datetime.now(timezone.utc)
     db.commit()
 
     log_activity(
-        db=db, user_id=str(user.id), role=user.role,
+        db=db, user_id=str(user.id), role=str(user.role),
         action="Deleted Child", module="Children", request=request
     )
 

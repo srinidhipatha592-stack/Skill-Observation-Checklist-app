@@ -6,7 +6,7 @@ from sqlalchemy import DateTime
 
 from sqlalchemy.dialects.postgresql import UUID
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.database import Base
 
@@ -38,5 +38,5 @@ class ActivityLog(Base):
 
     created_at = Column(
         DateTime,
-        default=datetime.utcnow
+        default=lambda: datetime.now(timezone.utc)
     )

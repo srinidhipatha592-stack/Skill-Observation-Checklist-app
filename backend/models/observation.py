@@ -9,7 +9,7 @@ from sqlalchemy import Boolean
 
 from sqlalchemy.dialects.postgresql import UUID
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.database import Base
 
@@ -52,7 +52,7 @@ class Observation(Base):
 
     observation_date = Column(
         DateTime,
-        default=datetime.utcnow
+        default=lambda: datetime.now(timezone.utc)
     )
 
     created_by = Column(

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.database import get_db
 from core.security import verify_access_token, hash_password
@@ -118,7 +118,7 @@ def delete_user(
 
     user.deleted = True
     user.deleted_by = admin.id
-    user.deleted_at = datetime.utcnow()
+    user.deleted_at = datetime.now(timezone.utc)
     user.is_active = False # Deactivate as well
     db.commit()
 

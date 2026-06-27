@@ -92,7 +92,7 @@ def register(
     log_activity(
         db=db,
         user_id=str(user.id),
-        role=user.role,
+        role=str(user.role),
         action="User Registered",
         module="Authentication",
         request=request
@@ -160,7 +160,7 @@ def login(
     log_activity(
         db=db,
         user_id=str(user.id),
-        role=user.role,
+        role=str(user.role),
         action="User Login",
         module="Authentication",
         request=request

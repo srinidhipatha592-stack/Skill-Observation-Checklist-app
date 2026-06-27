@@ -1,6 +1,6 @@
 import uuid
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column
 from sqlalchemy import String
@@ -56,7 +56,7 @@ class User(Base):
 
     created_at = Column(
         DateTime,
-        default=datetime.utcnow
+        default=lambda: datetime.now(timezone.utc)
     )
 
     # Teacher specific fields
@@ -70,4 +70,4 @@ class User(Base):
     # Soft delete fields
     deleted = Column(Boolean, default=False)
     deleted_by = Column(UUID(as_uuid=True), nullable=True)
-    deleted_at = Column(DateTime, nullable=True)
+    deleted_at = Column(DateTime, nullable=True)
