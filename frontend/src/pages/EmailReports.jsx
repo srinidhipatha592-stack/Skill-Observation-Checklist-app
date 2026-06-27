@@ -136,46 +136,75 @@ export default function EmailReports() {
 
   const generatePDFDoc = () => {
     const doc = new jsPDF();
-    doc.setFontSize(22);
+    
+    // Header
+    doc.setFontSize(24);
     doc.setTextColor(37, 99, 235);
-    doc.text("Skill Observation Checklist Report", 14, 20);
-    doc.setFontSize(14);
+    doc.text("Skill Observation Report", 14, 22);
+    
+    doc.setDrawColor(226, 232, 240);
+    doc.line(14, 28, 196, 28);
+    
+    // Child Info
+    doc.setFontSize(12);
     doc.setTextColor(15, 23, 42);
-    doc.text(`Child Name: ${selectedChild.name}`, 14, 35);
-    doc.text(
-      `Age: ${selectedChild.age || "N/A"} | Classroom: ${selectedChild.classroom || "N/A"}`,
-      14,
-      43
-    );
-    doc.text(
-      `Parent: ${selectedParent.name} (${selectedParent.email})`,
-      14,
-      51
-    );
-    doc.setFontSize(13);
-    doc.setTextColor(37, 99, 235);
-    doc.text("Summary", 14, 65);
+    doc.setFont(undefined, 'bold');
+    doc.text("Child Details", 14, 40);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Name: ${selectedChild.name}`, 14, 48);
+    doc.text(`Age: ${selectedChild.age || "N/A"}`, 14, 55);
+    doc.text(`Classroom: ${selectedChild.classroom || "N/A"}`, 80, 55);
+    doc.text(`Parent: ${selectedParent.name} (${selectedParent.email})`, 14, 62);
+
+    // Summary Stats
+    doc.setFont(undefined, 'bold');
     doc.setTextColor(15, 23, 42);
-    doc.setFontSize(11);
-    doc.text(`Total Observations: ${totalObs}`, 14, 73);
-    doc.text(`Average Rating: ${avgRating}`, 14, 80);
-    doc.text(`Best Skill: ${bestSkill}`, 14, 87);
-    doc.text(`Needs Work: ${weakestSkill}`, 14, 94);
+    doc.text("Observation Summary", 14, 78);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Total Observations: ${totalObs}`, 14, 86);
+    doc.text(`Average Rating: ${avgRating} / 5`, 80, 86);
+    doc.text(`Best Skill: ${bestSkill}`, 14, 93);
+    doc.text(`Needs Work: ${weakestSkill}`, 80, 93);
+
+    // Recommendations
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(15, 23, 42);
+    doc.text("Recommendations", 14, 109);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 116, 139);
+    
+    const strengthText = `Strengths: ${selectedChild.name} shows great aptitude in ${bestSkill}. Encourage continued practice.`;
+    const improveText = `Areas to Improve: Focus on activities that build confidence in ${weakestSkill}.`;
+    
+    const splitStrength = doc.splitTextToSize(strengthText, 180);
+    doc.text(splitStrength, 14, 117);
+    const strengthHeight = splitStrength.length * 7;
+    
+    const splitImprove = doc.splitTextToSize(improveText, 180);
+    doc.text(splitImprove, 14, 117 + strengthHeight);
+    const improveHeight = splitImprove.length * 7;
+
+    const tableStartY = 117 + strengthHeight + improveHeight + 10;
+
     if (childObservations.length > 0) {
-      doc.setFontSize(13);
-      doc.setTextColor(37, 99, 235);
-      doc.text("Recent Observations", 14, 108);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text("Recent Observations", 14, tableStartY);
       doc.autoTable({
-        startY: 114,
+        startY: tableStartY + 6,
         head: [["Date", "Skill", "Rating", "Notes"]],
-        body: childObservations.slice(0, 10).map((o) => [
+        body: childObservations.slice(0, 15).map((o) => [
           o.date || "",
           o.skill || "",
           `${o.rating}/5`,
           o.notes || "",
         ]),
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [37, 99, 235] },
+        styles: { fontSize: 10, cellPadding: 5 },
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        margin: { left: 14, right: 14 }
       });
     }
     return doc;
