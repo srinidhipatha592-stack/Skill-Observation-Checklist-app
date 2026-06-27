@@ -59,7 +59,12 @@ export default function Login() {
           errorMsg = err.response.data.detail[0]?.msg || errorMsg;
         }
       }
-      setError(errorMsg);
+      
+      if (errorMsg === "Account awaiting administrator approval") {
+        navigate("/pending-approval");
+      } else {
+        setError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
