@@ -27,6 +27,12 @@ class User(Base):
         nullable=False
     )
 
+    username = Column(
+        String,
+        unique=True,
+        nullable=True
+    )
+
     email = Column(
         String,
         unique=True,

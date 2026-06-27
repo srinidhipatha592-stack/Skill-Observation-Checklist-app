@@ -44,15 +44,26 @@ def register(
     ).first()
 
     if existing_user:
-
         raise HTTPException(
             status_code=400,
             detail="Email already exists"
         )
+        
+    if payload.username:
+        existing_username = db.query(User).filter(
+            User.username == payload.username
+        ).first()
+        
+        if existing_username:
+            raise HTTPException(
+                status_code=400,
+                detail="Username already exists"
+            )
 
     user = User(
         name=payload.name,
         email=payload.email,
+        username=payload.username,
         password_hash=hash_password(
             payload.password
         ),
