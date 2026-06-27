@@ -45,13 +45,15 @@ def create_child(
     db.commit()
     db.refresh(child)
 
-    if user.role == "teacher":
+    # Automatically assign the new child to all existing teachers
+    teachers = db.query(User).filter(User.role == "teacher").all()
+    for teacher in teachers:
         assignment = TeacherStudentAssignment(
-            teacher_id=user.id,
+            teacher_id=teacher.id,
             child_id=child.id
         )
         db.add(assignment)
-        db.commit()
+    db.commit()
 
     log_activity(
         db=db, user_id=str(user.id), role=str(user.role),
