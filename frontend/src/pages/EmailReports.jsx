@@ -14,7 +14,7 @@ import {
   FiDownload,
 } from "react-icons/fi";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import PageLoader from '../components/PageLoader';
 
 const token = () => localStorage.getItem("access_token");
@@ -197,7 +197,7 @@ export default function EmailReports() {
       doc.setFont(undefined, 'bold');
       doc.setTextColor(15, 23, 42);
       doc.text("Recent Observations", 14, tableStartY);
-      doc.autoTable({
+      autoTable(doc, {
         startY: tableStartY + 6,
         head: [["Date", "Skill", "Rating", "Notes"]],
         body: childObservations.slice(0, 15).map((o) => {
@@ -226,34 +226,25 @@ export default function EmailReports() {
     );
   };
 
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!selectedParentId || !selectedChildId) return;
-    setSending(true);
-    setError("");
-    setSuccess("");
-    try {
-      await axios.post(
-        "/api/reports/generate/",
-        {
-          child_id: selectedChildId,
-          parent_email: selectedParent.email,
-          report_type: "Monthly",
-        },
-        { headers: { Authorization: `Bearer ${token()}` } }
-      );
-      setSuccess(
-        `Report generated and sent successfully to ${selectedParent.email}`
-      );
-      setSelectedChildId("");
-      setSelectedParentId("");
-      setParentSearch("");
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || "Failed to send report. Please try again."
-      );
-    } finally {
-      setSending(false);
-    }
+    
+    // First download the PDF so the user can easily attach it
+    handleDownload();
+    
+    const subject = `Skill Observation Report – ${selectedChild?.name}`;
+    const body = `Dear ${selectedParent?.name},\n\nPlease find attached the latest Skill Observation Checklist Report for your child, ${selectedChild?.name}.\n\nThe report contains:\n• Progress Summary\n• Observation History\n• Personalised Recommendations\n\nRegards,\nSchool Administration`;
+
+    // Construct the Gmail link
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(selectedParent.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open Gmail in a new tab
+    window.open(gmailUrl, '_blank');
+    
+    setSuccess(`Downloaded PDF and opened Gmail. Please attach the downloaded PDF to the email.`);
+    
+    // Optional: Reset selections if needed, but keeping them might be better
+    // so the user knows who they just processed.
   };
 
   if (loading) return <PageLoader />;
