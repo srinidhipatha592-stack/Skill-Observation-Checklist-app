@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "../api/axios";
 import {
   FiMail,
@@ -8,16 +8,15 @@ import {
   FiEyeOff,
   FiAlertCircle,
 } from "react-icons/fi";
-import { MdChildCare } from "react-icons/md";
+import { MdAdminPanelSettings } from "react-icons/md";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
-export default function Login() {
+export default function AdminLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(location.state?.error || "");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,21 +30,20 @@ export default function Login() {
     try {
       const res = await axios.post("/api/auth/login", form);
       const { access_token, role, name, email, id } = res.data;
+      
+      if (role !== "admin") {
+        setError("Access Denied. Administrator privileges are required.");
+        setLoading(false);
+        return;
+      }
+
       localStorage.setItem("access_token", access_token);      
       localStorage.setItem("user_role", role);
       localStorage.setItem("user_name", name);
       localStorage.setItem("user_email", email);
       localStorage.setItem("user_id", id);
 
-      if (role === "admin") {
-          navigate("/dashboard");
-      } else if (role === "teacher") {
-          navigate("/observations");
-      } else if (role === "parent") {
-          navigate("/parent-portal");
-      } else {
-          navigate("/dashboard");
-      }
+      navigate("/admin-dashboard");
       
     } catch (err) {
       let errorMsg = "Invalid Email/Username or Password.";
@@ -68,35 +66,12 @@ export default function Login() {
       <div style={styles.panel}>
         <div style={styles.panelInner}>
           <div style={styles.panelLogo}>
-            <MdChildCare size={40} color="#fff" />
+            <MdAdminPanelSettings size={40} color="#fff" />
           </div>
-          <h1 style={styles.panelHeading}>Nurturing growth,<br />one milestone<br />at a time.</h1>
+          <h1 style={styles.panelHeading}>System<br />Administration<br />Portal.</h1>
           <p style={styles.panelSub}>
-            A unified platform for teachers, admins, and parents to track every child's developmental journey.
+            Secure access for authorized administrators to manage the SkillWatch platform.
           </p>
-
-          <div style={styles.pillRow}>
-            {["Teachers", "Admins", "Parents"].map((r) => (
-              <span key={r} style={styles.pill}>{r}</span>
-            ))}
-          </div>
-
-          {/* Decorative floating cards */}
-          <div style={styles.floatCard}>
-            <span style={styles.floatEmoji}>🌟</span>
-            <div>
-              <div style={styles.floatTitle}>98 observations</div>
-              <div style={styles.floatMeta}>logged this week</div>
-            </div>
-          </div>
-
-          <div style={{ ...styles.floatCard, ...styles.floatCardAlt }}>
-            <span style={styles.floatEmoji}>👧</span>
-            <div>
-              <div style={styles.floatTitle}>24 children</div>
-              <div style={styles.floatMeta}>tracked across 3 classrooms</div>
-            </div>
-          </div>
         </div>
 
         {/* Background blobs */}
@@ -107,14 +82,13 @@ export default function Login() {
       {/* Right form panel */}
       <div style={styles.formSide}>
         <div style={styles.formCard}>
-          {/* Mobile logo */}
           <div style={styles.mobileLogo}>
-            <MdChildCare size={28} color="#2563EB" />
-            <span style={styles.mobileLogoText}>SkillWatch</span>
+            <MdAdminPanelSettings size={28} color="#0F172A" />
+            <span style={styles.mobileLogoText}>Admin Portal</span>
           </div>
 
-          <h2 style={styles.formHeading}>Welcome back</h2>
-          <p style={styles.formSub}>Sign in to your account to continue</p>
+          <h2 style={styles.formHeading}>Admin Login</h2>
+          <p style={styles.formSub}>Enter your credentials to access the admin dashboard.</p>
 
           {error && (
             <div style={styles.errorBox}>
@@ -126,7 +100,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} style={styles.form}>
             {/* Email/Username */}
             <div style={styles.fieldGroup}>
-              <label style={styles.label}>Email/Username</label>
+              <label style={styles.label}>Admin Email or Username</label>
               <div style={styles.inputWrap}>
                 <FiMail size={16} style={styles.inputIcon} />
                 <input
@@ -134,7 +108,7 @@ export default function Login() {
                   type="text"
                   autoComplete="username"
                   required
-                  placeholder="Email or Username"
+                  placeholder="admin@skillcheck.com"
                   value={form.identifier}
                   onChange={handleChange}
                   style={styles.input}
@@ -146,24 +120,7 @@ export default function Login() {
 
             {/* Password */}
             <div style={styles.fieldGroup}>
-              <div style={styles.labelRow}>
-                <label style={styles.label}>Password</label>
-                <button
-                  type="button"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#2563EB",
-                    cursor: "pointer",
-                    fontSize: "12px"
-                  }}
-                  onClick={() =>
-                    alert("Please contact the administrator to reset your password.")
-                  }
-                >
-                  Forgot password?
-                </button>
-              </div>
+              <label style={styles.label}>Password</label>
               <div style={styles.inputWrap}>
                 <FiLock size={16} style={styles.inputIcon} />
                 <input
@@ -197,66 +154,38 @@ export default function Login() {
               {loading ? (
                 <span style={styles.spinnerWrap}>
                   <span style={styles.spinner} />
-                  Signing in…
+                  Authenticating…
                 </span>
               ) : (
-                "Sign in"
+                "Login to Admin Portal"
               )}
             </button>
           </form>
 
           <p style={styles.footer}>
-            Need access?{" "}
-            <a href="mailto:admin@school.edu" style={styles.footerLink}>
-              Contact your administrator
-            </a>
-            <br />
-            <br />
-            Don't have an account?{" "}
-            <Link to="/register" style={{...styles.footerLink, color: "#2563EB"}}>
-              Register here
+            Not an administrator?{" "}
+            <Link to="/login" style={styles.footerLink}>
+              Return to User Login
             </Link>
           </p>
-
-          <div style={styles.adminDivider}>
-            <span>Administrator Access</span>
-          </div>
-
-          <div style={{ textAlign: "center" }}>
-            <Link to="/admin" style={styles.adminBtn}>
-              Admin Login
-            </Link>
-          </div>
         </div>
       </div>
 
-      {/* Keyframe styles injected via a style tag */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body { font-family: 'Inter', sans-serif; }
-
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(18px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-
-        .login-form-card {
-          animation: fadeUp 0.45s ease both;
-        }
-
+        .login-form-card { animation: fadeUp 0.45s ease both; }
         @media (max-width: 768px) {
           .login-panel { display: none !important; }
-          .login-form-side {
-            width: 100% !important;
-            padding: 24px 16px !important;
-          }
+          .login-form-side { width: 100% !important; padding: 24px 16px !important; }
           .login-mobile-logo { display: flex !important; }
         }
       `}</style>
@@ -264,7 +193,6 @@ export default function Login() {
   );
 }
 
-/* ─── Inline styles ─────────────────────────────────────────────── */
 const styles = {
   root: {
     display: "flex",
@@ -272,12 +200,10 @@ const styles = {
     fontFamily: "'Inter', sans-serif",
     background: "#F8FAFC",
   },
-
-  /* Left decorative panel */
   panel: {
     className: "login-panel",
     flex: "0 0 480px",
-    background: "linear-gradient(145deg, #1D4ED8 0%, #2563EB 45%, #3B82F6 100%)",
+    background: "linear-gradient(145deg, #0F172A 0%, #1E293B 45%, #334155 100%)",
     position: "relative",
     overflow: "hidden",
     display: "flex",
@@ -316,48 +242,6 @@ const styles = {
     lineHeight: 1.6,
     marginBottom: 32,
   },
-  pillRow: {
-    display: "flex",
-    gap: 8,
-    marginBottom: 48,
-  },
-  pill: {
-    padding: "5px 14px",
-    borderRadius: 100,
-    background: "rgba(255,255,255,0.15)",
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: 500,
-    border: "1px solid rgba(255,255,255,0.25)",
-  },
-  floatCard: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    background: "rgba(255,255,255,0.12)",
-    backdropFilter: "blur(12px)",
-    border: "1px solid rgba(255,255,255,0.2)",
-    borderRadius: 14,
-    padding: "14px 18px",
-    marginBottom: 12,
-  },
-  floatCardAlt: {
-    background: "rgba(255,255,255,0.08)",
-  },
-  floatEmoji: {
-    fontSize: 24,
-    lineHeight: 1,
-  },
-  floatTitle: {
-    color: "#fff",
-    fontWeight: 600,
-    fontSize: 14,
-  },
-  floatMeta: {
-    color: "rgba(255,255,255,0.65)",
-    fontSize: 12,
-    marginTop: 2,
-  },
   blob1: {
     position: "absolute",
     width: 320,
@@ -378,8 +262,6 @@ const styles = {
     left: -80,
     zIndex: 1,
   },
-
-  /* Right form side */
   formSide: {
     flex: 1,
     display: "flex",
@@ -392,7 +274,6 @@ const styles = {
     maxWidth: 420,
     animation: "fadeUp 0.45s ease both",
   },
-
   mobileLogo: {
     display: "none",
     alignItems: "center",
@@ -402,9 +283,8 @@ const styles = {
   mobileLogoText: {
     fontSize: 18,
     fontWeight: 700,
-    color: "#1E293B",
+    color: "#0F172A",
   },
-
   formHeading: {
     fontSize: 28,
     fontWeight: 700,
@@ -417,7 +297,6 @@ const styles = {
     color: "#64748B",
     marginBottom: 28,
   },
-
   errorBox: {
     display: "flex",
     alignItems: "flex-start",
@@ -430,7 +309,6 @@ const styles = {
     fontSize: 13,
     marginBottom: 20,
   },
-
   form: {
     display: "flex",
     flexDirection: "column",
@@ -441,20 +319,10 @@ const styles = {
     flexDirection: "column",
     gap: 6,
   },
-  labelRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   label: {
     fontSize: 13,
     fontWeight: 500,
     color: "#374151",
-  },
-  forgot: {
-    fontSize: 12,
-    color: "#2563EB",
-    textDecoration: "none",
   },
   inputWrap: {
     position: "relative",
@@ -479,8 +347,8 @@ const styles = {
     transition: "border-color 0.2s, box-shadow 0.2s",
   },
   inputFocus: {
-    borderColor: "#2563EB",
-    boxShadow: "0 0 0 3px rgba(37,99,235,0.12)",
+    borderColor: "#0F172A",
+    boxShadow: "0 0 0 3px rgba(15,23,42,0.12)",
   },
   eyeBtn: {
     position: "absolute",
@@ -495,11 +363,10 @@ const styles = {
     alignItems: "center",
     padding: 4,
   },
-
   btn: {
     marginTop: 4,
     padding: "12px",
-    background: "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
+    background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
     color: "#fff",
     fontSize: 15,
     fontWeight: 600,
@@ -507,7 +374,7 @@ const styles = {
     borderRadius: 10,
     cursor: "pointer",
     transition: "opacity 0.2s, transform 0.15s",
-    boxShadow: "0 4px 14px rgba(37,99,235,0.35)",
+    boxShadow: "0 4px 14px rgba(15,23,42,0.35)",
   },
   btnDisabled: {
     opacity: 0.7,
@@ -528,7 +395,6 @@ const styles = {
     borderRadius: "50%",
     animation: "spin 0.7s linear infinite",
   },
-
   footer: {
     marginTop: 24,
     textAlign: "center",
@@ -536,32 +402,8 @@ const styles = {
     color: "#64748B",
   },
   footerLink: {
-    color: "#2563EB",
+    color: "#0F172A",
     fontWeight: 500,
     textDecoration: "none",
   },
-  adminDivider: {
-    display: "flex",
-    alignItems: "center",
-    textAlign: "center",
-    margin: "24px 0 16px",
-    color: "#94A3B8",
-    fontSize: 12,
-    fontWeight: 500,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px"
-  },
-  adminBtn: {
-    display: "inline-block",
-    padding: "8px 16px",
-    background: "#F1F5F9",
-    color: "#475569",
-    fontSize: 13,
-    fontWeight: 600,
-    border: "1px solid #E2E8F0",
-    borderRadius: 8,
-    textDecoration: "none",
-    transition: "all 0.2s"
-  }
 };
-

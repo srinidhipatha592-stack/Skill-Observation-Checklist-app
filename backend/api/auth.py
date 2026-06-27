@@ -61,6 +61,12 @@ def register(
                 detail="Username already exists"
             )
 
+    if payload.role == "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin accounts cannot be created via registration."
+        )
+
     user = User(
         name=payload.name,
         email=payload.email,

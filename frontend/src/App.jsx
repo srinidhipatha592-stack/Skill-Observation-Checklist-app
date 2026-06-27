@@ -35,6 +35,16 @@ import UserManagement from "./pages/UserManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 
+/* ADMIN PORTAL */
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminReports from "./pages/AdminReports";
+import AdminSettings from "./pages/AdminSettings";
+import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminChecklists from "./pages/AdminChecklists";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+
 function App() {
 
   return (
@@ -269,6 +279,67 @@ function App() {
             >
               <UserManagement />
             </RoleProtectedRoute>
+          }
+        />
+
+        {/* --- NEW ADMIN PORTAL ROUTES --- */}
+
+        <Route
+          path="/admin"
+          element={<AdminLogin />}
+        />
+
+        <Route
+          path="/admin-dashboard"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/users"
+          element={
+            <AdminProtectedRoute>
+              <AdminUsers />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/reports"
+          element={
+            <AdminProtectedRoute>
+              <AdminReports />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/settings"
+          element={
+            <AdminProtectedRoute>
+              <AdminSettings />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/analytics"
+          element={
+            <AdminProtectedRoute>
+              <AdminAnalytics />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/checklists"
+          element={
+            <AdminProtectedRoute>
+              <AdminChecklists />
+            </AdminProtectedRoute>
           }
         />
 
