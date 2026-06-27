@@ -71,7 +71,16 @@ def create_observation(
         action="Created Observation", module="Observations", request=request
     )
 
-    return observation
+    return {
+        "id": str(observation.id),
+        "child_id": str(observation.child_id),
+        "teacher_id": str(observation.teacher_id),
+        "skill": observation.skill,
+        "rating": observation.rating,
+        "notes": observation.notes,
+        "observation_date": observation.observation_date.isoformat() if observation.observation_date else None,
+        "created_by": str(observation.created_by) if observation.created_by else None,
+    }
 
 
 @router.get("/")
@@ -137,12 +146,25 @@ def get_child_observations(
         if not assignment:
             raise HTTPException(status_code=403, detail="Not assigned to this student")
 
-    observations = db.query(Observation).filter(Observation.child_id == child_id, Observation.deleted == False).all()
-    total_observations = len(observations)
+    observations_db = db.query(Observation).filter(Observation.child_id == child_id, Observation.deleted == False).all()
+    total_observations = len(observations_db)
     average_rating = 0
 
     if total_observations > 0:
-        average_rating = round(sum(obs.rating for obs in observations) / total_observations, 2)
+        average_rating = round(sum(obs.rating for obs in observations_db) / total_observations, 2)
+
+    observations = []
+    for obs in observations_db:
+        observations.append({
+            "id": str(obs.id),
+            "child_id": str(obs.child_id),
+            "teacher_id": str(obs.teacher_id),
+            "skill": obs.skill,
+            "rating": obs.rating,
+            "notes": obs.notes,
+            "observation_date": obs.observation_date.isoformat() if obs.observation_date else None,
+            "created_by": str(obs.created_by) if obs.created_by else None,
+        })
 
     return {
         "average_rating": average_rating,
@@ -174,7 +196,16 @@ def get_observation(
         if not assignment:
             raise HTTPException(status_code=403, detail="Not assigned to this student")
 
-    return observation
+    return {
+        "id": str(observation.id),
+        "child_id": str(observation.child_id),
+        "teacher_id": str(observation.teacher_id),
+        "skill": observation.skill,
+        "rating": observation.rating,
+        "notes": observation.notes,
+        "observation_date": observation.observation_date.isoformat() if observation.observation_date else None,
+        "created_by": str(observation.created_by) if observation.created_by else None,
+    }
 
 
 @router.put("/{observation_id}")
@@ -216,7 +247,16 @@ def update_observation(
         action="Updated Observation", module="Observations", request=request
     )
 
-    return observation
+    return {
+        "id": str(observation.id),
+        "child_id": str(observation.child_id),
+        "teacher_id": str(observation.teacher_id),
+        "skill": observation.skill,
+        "rating": observation.rating,
+        "notes": observation.notes,
+        "observation_date": observation.observation_date.isoformat() if observation.observation_date else None,
+        "created_by": str(observation.created_by) if observation.created_by else None,
+    }
 
 
 @router.delete("/{observation_id}")

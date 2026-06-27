@@ -20,7 +20,8 @@ export default function AdminSidebar() {
 
   const navItems = [
     { name: "Dashboard", path: "/admin-dashboard", icon: FiPieChart },
-    { name: "User Management", path: "/admin/users", icon: FiUsers },
+    { name: "Approvals", path: "/admin/approvals", icon: FiUsers },
+    { name: "Assignments", path: "/admin/assignments", icon: FiCheckSquare },
     { name: "Checklists", path: "/admin/checklists", icon: FiCheckSquare },
     { name: "Reports", path: "/admin/reports", icon: FiBarChart2 },
     { name: "Analytics", path: "/admin/analytics", icon: FiBarChart2 },

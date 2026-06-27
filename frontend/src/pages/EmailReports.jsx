@@ -238,13 +238,16 @@ export default function EmailReports() {
     // Construct the Gmail link
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(selectedParent.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Open Gmail in a new tab
-    window.open(gmailUrl, '_blank');
+    // Create a temporary anchor element and click it to trigger mail client without popup blockers
+    const link = document.createElement('a');
+    link.href = gmailUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
     setSuccess(`Downloaded PDF and opened Gmail. Please attach the downloaded PDF to the email.`);
-    
-    // Optional: Reset selections if needed, but keeping them might be better
-    // so the user knows who they just processed.
   };
 
   if (loading) return <PageLoader />;

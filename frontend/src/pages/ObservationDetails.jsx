@@ -136,14 +136,16 @@ export default function ObservationDetails() {
             }}>
               <FiEdit2 size={15} /> Edit
             </button>
-            <button onClick={handleDelete} disabled={deleting} style={{
-              display: "flex", alignItems: "center", gap: 8, padding: "10px 22px",
-              background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12,
-              fontSize: 14, fontWeight: 600, color: "#DC2626", cursor: deleting ? "not-allowed" : "pointer",
-              opacity: deleting ? 0.65 : 1
-            }}>
-              <FiTrash2 size={15} /> {deleting ? "Deleting…" : "Delete"}
-            </button>
+            {userRole === 'admin' && (
+              <button onClick={handleDelete} disabled={deleting} style={{
+                display: "flex", alignItems: "center", gap: 8, padding: "10px 22px",
+                background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12,
+                fontSize: 14, fontWeight: 600, color: "#DC2626", cursor: deleting ? "not-allowed" : "pointer",
+                opacity: deleting ? 0.65 : 1
+              }}>
+                <FiTrash2 size={15} /> {deleting ? "Deleting…" : "Delete"}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -316,15 +318,17 @@ export default function ObservationDetails() {
               }}>
                 View Child Performance
               </button>
-              <button onClick={handleDelete} disabled={deleting} style={{
-                width: "100%", padding: "13px 0", background: "#FEF2F2", border: "1px solid #FECACA",
-                borderRadius: 14, fontSize: 14, fontWeight: 600, color: "#DC2626",
-                cursor: deleting ? "not-allowed" : "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                opacity: deleting ? 0.65 : 1
-              }}>
-                <FiTrash2 size={15} /> {deleting ? "Deleting…" : "Delete Observation"}
-              </button>
+              {userRole === 'admin' && (
+                <button onClick={handleDelete} disabled={deleting} style={{
+                  width: "100%", padding: "13px 0", background: "#FEF2F2", border: "1px solid #FECACA",
+                  borderRadius: 14, fontSize: 14, fontWeight: 600, color: "#DC2626",
+                  cursor: deleting ? "not-allowed" : "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  opacity: deleting ? 0.65 : 1
+                }}>
+                  <FiTrash2 size={15} /> {deleting ? "Deleting…" : "Delete Observation"}
+                </button>
+              )}
             </div>
           )}
         </div>

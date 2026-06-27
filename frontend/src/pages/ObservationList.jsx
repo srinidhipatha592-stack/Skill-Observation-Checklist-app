@@ -181,16 +181,16 @@ export default function ObservationList() {
                             <FiEye size={15} />
                           </button>
                           {canEdit && (
-                            <>
-                              <button onClick={() => navigate(`/observations/edit/${obs.id}`)} title="Edit"
-                                style={{ padding: "7px 10px", background: "#FFFBEB", border: "none", borderRadius: 10, cursor: "pointer", color: "#D97706", display: "flex", alignItems: "center" }}>
-                                <FiEdit2 size={15} />
-                              </button>
-                              <button onClick={() => handleDelete(obs.id)} disabled={deleting === obs.id} title="Delete"
-                                style={{ padding: "7px 10px", background: "#FEF2F2", border: "none", borderRadius: 10, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", opacity: deleting === obs.id ? 0.5 : 1 }}>
-                                <FiTrash2 size={15} />
-                              </button>
-                            </>
+                            <button onClick={() => navigate(`/observations/edit/${obs.id}`)} title="Edit"
+                              style={{ padding: "7px 10px", background: "#FFFBEB", border: "none", borderRadius: 10, cursor: "pointer", color: "#D97706", display: "flex", alignItems: "center" }}>
+                              <FiEdit2 size={15} />
+                            </button>
+                          )}
+                          {userRole === 'admin' && (
+                            <button onClick={() => handleDelete(obs.id)} disabled={deleting === obs.id} title="Delete"
+                              style={{ padding: "7px 10px", background: "#FEF2F2", border: "none", borderRadius: 10, cursor: "pointer", color: "#EF4444", display: "flex", alignItems: "center", opacity: deleting === obs.id ? 0.5 : 1 }}>
+                              <FiTrash2 size={15} />
+                            </button>
                           )}
                         </div>
                       </td>

@@ -288,33 +288,35 @@ function ChildDetails() {
               Edit Child
             </button>
 
-            <button
-              onClick={deleteChild}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "#ef4444",
-                color: "#fff",
-                border: "none",
-                padding: "11px 20px",
-                borderRadius: "10px",
-                cursor: "pointer",
-                fontWeight: 700,
-                fontSize: "14px",
-                boxShadow: "0 10px 20px rgba(239,68,68,0.25)",
-                transition: "background 0.18s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#dc2626";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#ef4444";
-              }}
-            >
-              <MdDeleteOutline size={17} />
-              Delete Child
-            </button>
+            {localStorage.getItem("user_role") === "admin" && (
+              <button
+                onClick={deleteChild}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: "#ef4444",
+                  color: "#fff",
+                  border: "none",
+                  padding: "11px 20px",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  boxShadow: "0 10px 20px rgba(239,68,68,0.25)",
+                  transition: "background 0.18s ease"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#dc2626";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#ef4444";
+                }}
+              >
+                <MdDeleteOutline size={17} />
+                Delete Child
+              </button>
+            )}
 
           </div>
 

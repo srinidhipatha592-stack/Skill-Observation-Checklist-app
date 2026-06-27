@@ -8,9 +8,12 @@ import {
   FiEyeOff,
   FiAlertCircle,
   FiUser,
-  FiCheckCircle
+  FiCheckCircle,
+  FiBriefcase,
+  FiAward
 } from "react-icons/fi";
 import { MdChildCare, MdOutlineSupervisorAccount } from "react-icons/md";
+import { IoSchoolOutline } from "react-icons/io5";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -22,7 +25,10 @@ export default function Register() {
     username: "",
     password: "",
     confirmPassword: "",
-    role: "teacher"
+    role: "teacher",
+    school_name: "",
+    employee_id: "",
+    qualification: "",
   });
   
   const [showPassword, setShowPassword] = useState(false);
@@ -71,6 +77,13 @@ export default function Register() {
         role: form.role
       };
 
+      // Add teacher specific fields if applicable
+      if (form.role === "teacher") {
+        payload.school_name = form.school_name;
+        payload.employee_id = form.employee_id;
+        payload.qualification = form.qualification;
+      }
+
       await axios.post("/api/auth/register", payload);
       
       setSuccess("Account created successfully! Logging you in...");
@@ -81,15 +94,19 @@ export default function Register() {
         password: form.password
       });
       
-      const { access_token, role, name, email, id } = loginRes.data;
+      const { access_token, role, name, email, id, status } = loginRes.data;
       localStorage.setItem("access_token", access_token);      
       localStorage.setItem("user_role", role);
       localStorage.setItem("user_name", name);
       localStorage.setItem("user_email", email);
       localStorage.setItem("user_id", id);
+      if (status) localStorage.setItem("user_status", status);
       
       setTimeout(() => {
-        if (role === "admin") {
+        // Redirect based on role or status
+        if (role === "teacher" && status === "pending") {
+          navigate("/pending-approval");
+        } else if (role === "admin") {
             navigate("/dashboard");
         } else if (role === "teacher") {
             navigate("/observations");
@@ -223,24 +240,6 @@ export default function Register() {
               </div>
             </div>
 
-            {/* Username (optional) */}
-            <div style={styles.fieldGroup}>
-              <label style={styles.label}>Username (Optional)</label>
-              <div style={styles.inputWrap}>
-                <FiUser size={16} style={styles.inputIcon} />
-                <input
-                  name="username"
-                  type="text"
-                  placeholder="johndoe123"
-                  value={form.username}
-                  onChange={handleChange}
-                  style={styles.input}
-                  onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
-                  onBlur={e => Object.assign(e.target.style, { borderColor: "#E2E8F0", boxShadow: "none" })}
-                />
-              </div>
-            </div>
-
             {/* Role */}
             <div style={styles.fieldGroup}>
               <label style={styles.label}>Role</label>
@@ -257,10 +256,70 @@ export default function Register() {
                 >
                   <option value="teacher">Teacher</option>
                   <option value="parent">Parent</option>
-                  {/* Admin role is typically assigned, not registered directly by the user, but we can allow it for testing */}
                 </select>
               </div>
             </div>
+
+            {/* Teacher Specific Fields */}
+            {form.role === "teacher" && (
+              <>
+                <div style={styles.fieldGroup}>
+                  <label style={styles.label}>School Name</label>
+                  <div style={styles.inputWrap}>
+                    <IoSchoolOutline size={16} style={styles.inputIcon} />
+                    <input
+                      name="school_name"
+                      type="text"
+                      required
+                      placeholder="e.g. Springfield Elementary"
+                      value={form.school_name}
+                      onChange={handleChange}
+                      style={styles.input}
+                      onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
+                      onBlur={e => Object.assign(e.target.style, { borderColor: "#E2E8F0", boxShadow: "none" })}
+                    />
+                  </div>
+                </div>
+
+                <div style={styles.rowGroup}>
+                  <div style={{...styles.fieldGroup, flex: 1}}>
+                    <label style={styles.label}>Employee ID</label>
+                    <div style={styles.inputWrap}>
+                      <FiBriefcase size={16} style={styles.inputIcon} />
+                      <input
+                        name="employee_id"
+                        type="text"
+                        required
+                        placeholder="e.g. EMP123"
+                        value={form.employee_id}
+                        onChange={handleChange}
+                        style={styles.input}
+                        onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
+                        onBlur={e => Object.assign(e.target.style, { borderColor: "#E2E8F0", boxShadow: "none" })}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{...styles.fieldGroup, flex: 1}}>
+                    <label style={styles.label}>Qualification</label>
+                    <div style={styles.inputWrap}>
+                      <FiAward size={16} style={styles.inputIcon} />
+                      <input
+                        name="qualification"
+                        type="text"
+                        required
+                        placeholder="e.g. B.Ed"
+                        value={form.qualification}
+                        onChange={handleChange}
+                        style={styles.input}
+                        onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
+                        onBlur={e => Object.assign(e.target.style, { borderColor: "#E2E8F0", boxShadow: "none" })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div style={styles.rowGroup}>
                 {/* Password */}

@@ -7,6 +7,7 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import PendingApproval from "./pages/PendingApproval";
 
 import Children from "./pages/Children";
 import AddChild from "./pages/AddChild";
@@ -39,6 +40,8 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
+import AdminApprovals from "./pages/AdminApprovals";
+import AdminAssignments from "./pages/AdminAssignments";
 import AdminReports from "./pages/AdminReports";
 import AdminSettings from "./pages/AdminSettings";
 import AdminAnalytics from "./pages/AdminAnalytics";
@@ -66,6 +69,11 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        <Route
+          path="/pending-approval"
+          element={<PendingApproval />}
         />
 
         <Route
@@ -303,6 +311,24 @@ function App() {
           element={
             <AdminProtectedRoute>
               <AdminUsers />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/approvals"
+          element={
+            <AdminProtectedRoute>
+              <AdminApprovals />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/assignments"
+          element={
+            <AdminProtectedRoute>
+              <AdminAssignments />
             </AdminProtectedRoute>
           }
         />

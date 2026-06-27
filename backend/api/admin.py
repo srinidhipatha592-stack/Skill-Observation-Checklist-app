@@ -92,3 +92,12 @@ def assign_students(teacher_id: str, payload: AssignmentRequest, admin: User = D
     db.commit()
     
     return {"message": "Students assigned successfully"}
+
+@router.get("/teachers/{teacher_id}/assignments")
+def get_teacher_assignments(teacher_id: str, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    teacher = db.query(User).filter(User.id == teacher_id, User.role == "teacher", User.deleted == False).first()
+    if not teacher:
+        raise HTTPException(status_code=404, detail="Teacher not found")
+        
+    assignments = db.query(TeacherStudentAssignment).filter(TeacherStudentAssignment.teacher_id == teacher.id).all()
+    return {"child_ids": [str(a.child_id) for a in assignments]}

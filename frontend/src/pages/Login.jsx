@@ -30,14 +30,17 @@ export default function Login() {
     setError("");
     try {
       const res = await axios.post("/api/auth/login", form);
-      const { access_token, role, name, email, id } = res.data;
+      const { access_token, role, name, email, id, status } = res.data;
       localStorage.setItem("access_token", access_token);      
       localStorage.setItem("user_role", role);
       localStorage.setItem("user_name", name);
       localStorage.setItem("user_email", email);
       localStorage.setItem("user_id", id);
+      if (status) localStorage.setItem("user_status", status);
 
-      if (role === "admin") {
+      if (role === "teacher" && status === "pending") {
+          navigate("/pending-approval");
+      } else if (role === "admin") {
           navigate("/dashboard");
       } else if (role === "teacher") {
           navigate("/observations");
@@ -564,4 +567,5 @@ const styles = {
     transition: "all 0.2s"
   }
 };
+
 
