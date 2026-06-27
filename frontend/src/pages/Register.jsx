@@ -77,7 +77,7 @@ export default function Register() {
       
       // Auto-login
       const loginRes = await axios.post("/api/auth/login", {
-        email: form.email,
+        identifier: form.email,
         password: form.password
       });
       
@@ -101,9 +101,15 @@ export default function Register() {
       }, 1500);
       
     } catch (err) {
-      setError(
-        err?.response?.data?.detail || "Registration failed. Please try again."
-      );
+      let errorMsg = "Registration failed. Please try again.";
+      if (err?.response?.data?.detail) {
+        if (typeof err.response.data.detail === "string") {
+          errorMsg = err.response.data.detail;
+        } else if (Array.isArray(err.response.data.detail)) {
+          errorMsg = err.response.data.detail[0]?.msg || errorMsg;
+        }
+      }
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

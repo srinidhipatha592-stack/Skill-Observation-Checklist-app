@@ -48,9 +48,15 @@ export default function Login() {
       }
       
     } catch (err) {
-      setError(
-        err?.response?.data?.detail || "Invalid Email/Username or Password."
-      );
+      let errorMsg = "Invalid Email/Username or Password.";
+      if (err?.response?.data?.detail) {
+        if (typeof err.response.data.detail === "string") {
+          errorMsg = err.response.data.detail;
+        } else if (Array.isArray(err.response.data.detail)) {
+          errorMsg = err.response.data.detail[0]?.msg || errorMsg;
+        }
+      }
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
