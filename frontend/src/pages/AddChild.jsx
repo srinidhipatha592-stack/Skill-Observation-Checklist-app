@@ -23,6 +23,9 @@ function AddChild() {
   const [gender, setGender] = useState("");
 
   const [parentName, setParentName] = useState("");
+  const [parentEmail, setParentEmail] = useState(
+    localStorage.getItem("user_role") === "parent" ? localStorage.getItem("user_email") : ""
+  );
   const [parentPhone, setParentPhone] = useState("");
 
   const [classroom, setClassroom] = useState("");
@@ -35,108 +38,48 @@ function AddChild() {
   const [submitting, setSubmitting] = useState(false);
 
   const validate = () => {
-
     const newErrors = {};
-
-    if (!name.trim()) {
-      newErrors.name = "Child name is required";
-    }
-
-    if (!age || Number(age) <= 0) {
-      newErrors.age = "Enter a valid age";
-    }
-
-    if (!classroom.trim()) {
-      newErrors.classroom = "Classroom is required";
-    }
-
-    if (!parentName.trim()) {
-      newErrors.parentName = "Parent name is required";
-    }
-
+    if (!name.trim()) newErrors.name = "Child name is required";
+    if (!age || Number(age) <= 0) newErrors.age = "Enter a valid age";
+    if (!classroom.trim()) newErrors.classroom = "Classroom is required";
+    if (!parentName.trim()) newErrors.parentName = "Parent name is required";
+    if (!parentEmail.trim()) newErrors.parentEmail = "Parent email is required";
+    
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
-
   };
 
   const submitChild = async (e) => {
-
     e.preventDefault();
-
-    if (!validate()) {
-      return;
-    }
-
+    if (!validate()) return;
+    
     setSubmitting(true);
-
     try {
-
-      const token =
-        localStorage.getItem(
-          "access_token"
-        );
-
-      const parentEmail =
-        localStorage.getItem(
-          "user_email"
-        );
-
+      const token = localStorage.getItem("access_token");
       await axios.post(
         "/api/children/",
         {
           name,
           age: Number(age),
           gender,
-
           parent_name: parentName,
-
-          parent_email:
-            parentEmail,
-
-          parent_phone:
-            parentPhone,
-
+          parent_email: parentEmail,
+          parent_phone: parentPhone,
           classroom,
-
-          admission_date:
-            admissionDate,
-
+          admission_date: admissionDate,
           allergies,
-
-          medical_notes:
-            medicalNotes
+          medical_notes: medicalNotes
         },
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      alert(
-        "Child Added Successfully"
-      );
-
-      navigate(
-        "/children"
-      );
-
+      alert("Child Added Successfully");
+      navigate("/children");
     } catch (error) {
-
       console.error(error);
-
-      alert(
-        "Failed To Add Child"
-      );
-
+      alert("Failed To Add Child");
     } finally {
-
       setSubmitting(false);
-
     }
-
   };
 
   const cardStyle = {
@@ -440,19 +383,26 @@ function AddChild() {
                   <label style={labelStyle}>Parent Email</label>
                   <input
                     type="email"
-                    value={
-                      localStorage.getItem(
-                        "user_email"
-                      ) || ""
+                    placeholder="e.g. sarah.j@example.com"
+                    value={parentEmail}
+                    onChange={(e) => setParentEmail(e.target.value)}
+                    readOnly={localStorage.getItem("user_role") === "parent"}
+                    style={
+                      localStorage.getItem("user_role") === "parent"
+                        ? {
+                            ...inputStyle(false),
+                            background: "#f1f5f9",
+                            color: "#64748b",
+                            cursor: "not-allowed"
+                          }
+                        : inputStyle(!!errors.parentEmail)
                     }
-                    readOnly
-                    style={{
-                      ...inputStyle(false),
-                      background: "#f1f5f9",
-                      color: "#64748b",
-                      cursor: "not-allowed"
-                    }}
+                    onFocus={localStorage.getItem("user_role") !== "parent" ? handleFocus : undefined}
+                    onBlur={(e) => localStorage.getItem("user_role") !== "parent" ? handleBlur(e, !!errors.parentEmail) : undefined}
                   />
+                  {errors.parentEmail && (
+                    <p style={errorTextStyle}>{errors.parentEmail}</p>
+                  )}
                 </div>
 
                 <div>
