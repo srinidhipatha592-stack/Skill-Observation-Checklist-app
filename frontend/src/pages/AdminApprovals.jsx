@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../api/axios";
-import AdminSidebar from "../components/AdminSidebar";
+import Sidebar from "../components/Sidebar";
 import { FiCheck, FiX, FiAlertCircle } from "react-icons/fi";
 
 export default function AdminApprovals() {
@@ -46,7 +46,7 @@ export default function AdminApprovals() {
 
   return (
     <div style={styles.root}>
-      <AdminSidebar />
+      <Sidebar />
       <main style={styles.main}>
         <header style={styles.header}>
           <h1 style={styles.pageTitle}>Teacher Approvals</h1>
@@ -118,7 +118,7 @@ export default function AdminApprovals() {
 
 const styles = {
   root: { display: "flex", minHeight: "100vh", backgroundColor: "#F8FAFC", fontFamily: "'Inter', sans-serif" },
-  main: { flex: 1, marginLeft: "260px", padding: "32px 40px" },
+  main: { flex: 1, marginLeft: "var(--sidebar-width)", padding: "32px 40px", boxSizing: "border-box", maxWidth: "100%" },
   header: { marginBottom: "32px" },
   pageTitle: { fontSize: "24px", fontWeight: 700, color: "#0F172A", margin: "0 0 4px 0" },
   pageSub: { fontSize: "15px", color: "#64748B", margin: 0 },

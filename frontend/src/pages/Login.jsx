@@ -228,15 +228,6 @@ export default function Login() {
             </Link>
           </p>
 
-          <div style={styles.adminDivider}>
-            <span>Administrator Access</span>
-          </div>
-
-          <div style={{ textAlign: "center" }}>
-            <Link to="/admin" style={styles.adminBtn}>
-              Admin Login
-            </Link>
-          </div>
         </div>
       </div>
 

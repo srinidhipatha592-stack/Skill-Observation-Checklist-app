@@ -21,6 +21,7 @@ const navByRole = {
   admin: [
     { label: 'Dashboard',     path: '/dashboard',      icon: <RiDashboardLine /> },
     { label: 'User Management', path: '/user-management', icon: <RiTeamLine /> },
+    { label: 'Approvals',     path: '/approvals',      icon: <RiTeamLine /> },
     { label: 'Children',      path: '/children',       icon: <RiTeamLine /> },
     { label: 'Observations',  path: '/observations',   icon: <RiBookOpenLine /> },
     { label: 'Progress',      path: '/progress',       icon: <RiBarChartLine /> },

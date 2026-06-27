@@ -316,11 +316,15 @@ function App() {
         />
 
         <Route
-          path="/admin/approvals"
+          path="/approvals"
           element={
-            <AdminProtectedRoute>
+            <RoleProtectedRoute
+              allowedRoles={[
+                "admin"
+              ]}
+            >
               <AdminApprovals />
-            </AdminProtectedRoute>
+            </RoleProtectedRoute>
           }
         />
 
