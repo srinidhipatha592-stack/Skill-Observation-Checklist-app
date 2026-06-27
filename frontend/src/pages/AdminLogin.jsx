@@ -46,7 +46,7 @@ export default function AdminLogin() {
       navigate("/admin-dashboard");
       
     } catch (err) {
-      let errorMsg = "Invalid Email/Username or Password.";
+      let errorMsg = "Invalid credentials. Please try again.";
       if (err?.response?.data?.detail) {
         if (typeof err.response.data.detail === "string") {
           errorMsg = err.response.data.detail;
@@ -55,6 +55,8 @@ export default function AdminLogin() {
         }
       }
       setError(errorMsg);
+      // Force a tiny re-render for shake animation if error is same
+      setTimeout(() => setError(errorMsg), 50);
     } finally {
       setLoading(false);
     }
@@ -91,7 +93,7 @@ export default function AdminLogin() {
           <p style={styles.formSub}>Enter your credentials to access the admin dashboard.</p>
 
           {error && (
-            <div style={styles.errorBox}>
+            <div style={styles.errorBox} className="shake-animation">
               <FiAlertCircle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
               <span>{error}</span>
             </div>
@@ -182,7 +184,13 @@ export default function AdminLogin() {
           from { opacity: 0; transform: translateY(18px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
+        }
         .login-form-card { animation: fadeUp 0.45s ease both; }
+        .shake-animation { animation: shake 0.3s ease-in-out; }
         @media (max-width: 768px) {
           .login-panel { display: none !important; }
           .login-form-side { width: 100% !important; padding: 24px 16px !important; }
