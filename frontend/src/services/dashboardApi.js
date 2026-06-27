@@ -1,15 +1,9 @@
-import axios from "axios";
+import axios from "../api/axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-const API_URL = `${API_BASE_URL}/api/dashboard/stats`;
-
-export const getDashboardStats =
-async () => {
-
-  const response =
-    await axios.get(API_URL);
-
+export const getDashboardStats = async () => {
+  const token = localStorage.getItem("access_token");
+  const response = await axios.get("/api/dashboard/stats", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   return response.data;
-
 };
