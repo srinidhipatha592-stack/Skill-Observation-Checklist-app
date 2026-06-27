@@ -107,7 +107,11 @@ export default function EmailReports() {
   const childObservations = selectedChild
     ? observations
         .filter((o) => String(o.child_id) === selectedChildId)
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .sort((a, b) => {
+          const dA = new Date(a.observation_date || a.created_at || a.date);
+          const dB = new Date(b.observation_date || b.created_at || b.date);
+          return dB - dA;
+        })
     : [];
 
   const totalObs = childObservations.length;
@@ -119,9 +123,10 @@ export default function EmailReports() {
 
   const skillCount = {};
   childObservations.forEach((o) => {
-    if (!skillCount[o.skill]) skillCount[o.skill] = { sum: 0, count: 0 };
-    skillCount[o.skill].sum += o.rating;
-    skillCount[o.skill].count += 1;
+    const s = o.skill_name || o.skill || "General";
+    if (!skillCount[s]) skillCount[s] = { sum: 0, count: 0 };
+    skillCount[s].sum += o.rating;
+    skillCount[s].count += 1;
   });
 
   let bestSkill = "N/A";
@@ -195,12 +200,15 @@ export default function EmailReports() {
       doc.autoTable({
         startY: tableStartY + 6,
         head: [["Date", "Skill", "Rating", "Notes"]],
-        body: childObservations.slice(0, 15).map((o) => [
-          o.date || "",
-          o.skill || "",
-          `${o.rating}/5`,
-          o.notes || "",
-        ]),
+        body: childObservations.slice(0, 15).map((o) => {
+          const d = o.observation_date || o.created_at || o.date;
+          return [
+            d ? new Date(d).toLocaleDateString() : "",
+            o.skill_name || o.skill || "General",
+            `${o.rating}/5`,
+            o.notes || "",
+          ];
+        }),
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
         alternateRowStyles: { fillColor: [248, 250, 252] },
@@ -707,13 +715,15 @@ const filteredParents = users.filter(
                           </tr>
                         </thead>
                         <tbody>
-                          {childObservations.slice(0, 5).map((o) => (
+                          {childObservations.slice(0, 5).map((o) => {
+                            const d = o.observation_date || o.created_at || o.date;
+                            return (
                             <tr key={o.id}>
                               <td style={{ padding: "10px 12px", borderBottom: "1px solid #F1F5F9" }}>
-                                {o.date}
+                                {d ? new Date(d).toLocaleDateString() : ""}
                               </td>
                               <td style={{ padding: "10px 12px", borderBottom: "1px solid #F1F5F9" }}>
-                                {o.skill}
+                                {o.skill_name || o.skill || "General"}
                               </td>
                               <td
                                 style={{
@@ -726,7 +736,8 @@ const filteredParents = users.filter(
                                 {o.rating}/5
                               </td>
                             </tr>
-                          ))}
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
