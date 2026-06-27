@@ -125,6 +125,8 @@ def get_observations(
 
             "teacher_name": teacher.name if teacher else "Unknown Teacher",
 
+            "skill": obs.skill,
+
             "skill_area": obs.skill,
 
             "rating": obs.rating,
