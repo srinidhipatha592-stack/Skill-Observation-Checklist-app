@@ -111,8 +111,9 @@ def login(
     db: Session = Depends(get_db)
 ):
 
+    identifier = payload.identifier.strip()
     user = db.query(User).filter(
-        or_(User.email == payload.identifier, User.username == payload.identifier)
+        or_(User.email == identifier, User.username == identifier)
     ).first()
 
     if not user:
