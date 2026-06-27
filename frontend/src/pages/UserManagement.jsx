@@ -1,5 +1,6 @@
 import Sidebar from '../components/Sidebar';
 import { useEffect, useState } from "react";
+import axios from "../api/axios";
 
 function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -21,15 +22,11 @@ function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-      const response = await fetch(`${API_BASE}/api/users/`);
-
-      const data = await response.json();
-
-      setUsers(data);
+      const response = await axios.get("/api/users/");
+      // Ensure we always set an array to prevent crashes
+      setUsers(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.log(error);
-
       alert("Failed to load users");
     } finally {
       setLoading(false);
@@ -38,7 +35,6 @@ function UserManagement() {
 
   const clearForm = () => {
     setEditingUserId(null);
-
     setName("");
     setEmail("");
     setPassword("");
@@ -48,132 +44,73 @@ function UserManagement() {
   const createUser = async () => {
     if (!name || !email || !password || !role) {
       alert("Fill all fields");
-
       return;
     }
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-      const response = await fetch(`${API_BASE}/api/users/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          role,
-        }),
+      await axios.post("/api/users/", {
+        name,
+        email,
+        password,
+        role,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.detail || "Failed to create user");
-
-        return;
-      }
-
       alert("User created successfully");
-
       clearForm();
-
       fetchUsers();
     } catch (error) {
       console.log(error);
-
-      alert("Server Error");
+      alert(error.response?.data?.detail || "Failed to create user");
     }
   };
 
   const updateUser = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-      const response = await fetch(
-        `${API_BASE}/api/users/${editingUserId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-            role,
-          }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.detail || "Failed to update user");
-
-        return;
-      }
+      await axios.put(`/api/users/${editingUserId}`, {
+        name,
+        email,
+        password,
+        role,
+      });
 
       alert("User updated successfully");
-
       clearForm();
-
       fetchUsers();
     } catch (error) {
       console.log(error);
-
-      alert("Server Error");
+      alert(error.response?.data?.detail || "Failed to update user");
     }
   };
 
   const editUser = (user) => {
     setEditingUserId(user.id);
-
     setName(user.name);
-
     setEmail(user.email);
-
     setRole(user.role);
-
     setPassword("");
   };
 
   const deleteUser = async (userId) => {
     const confirmDelete = window.confirm("Delete this user?");
-
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-      const response = await fetch(
-        `${API_BASE}/api/users/${userId}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        alert("Failed to delete user");
-
-        return;
-      }
-
+      await axios.delete(`/api/users/${userId}`);
       alert("User deleted successfully");
-
       fetchUsers();
     } catch (error) {
       console.log(error);
-
-      alert("Server Error");
+      alert("Failed to delete user");
     }
   };
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = (users || []).filter((user) => {
+    const nameStr = user.name || "";
+    const emailStr = user.email || "";
+    
     const matchesSearch =
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase());
+      nameStr.toLowerCase().includes((search || "").toLowerCase()) ||
+      emailStr.toLowerCase().includes((search || "").toLowerCase());
 
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
 
