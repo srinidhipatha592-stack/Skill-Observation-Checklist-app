@@ -6,6 +6,7 @@ from fastapi.security import HTTPBearer
 from fastapi.security import HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from core.database import get_db
 
@@ -46,7 +47,7 @@ def register(
     if existing_user:
         raise HTTPException(
             status_code=400,
-            detail="Email already exists"
+            detail="An account with this email already exists. Please log in."
         )
         
     if payload.username:
@@ -97,14 +98,14 @@ def login(
 ):
 
     user = db.query(User).filter(
-        User.email == payload.email
+        or_(User.email == payload.identifier, User.username == payload.identifier)
     ).first()
 
     if not user:
 
         raise HTTPException(
             status_code=401,
-            detail="Invalid credentials"
+            detail="Invalid Email/Username or Password."
         )
 
     if user.is_active is False:
@@ -121,7 +122,7 @@ def login(
 
         raise HTTPException(
             status_code=401,
-            detail="Invalid credentials"
+            detail="Invalid Email/Username or Password."
         )
 
     token = create_access_token(

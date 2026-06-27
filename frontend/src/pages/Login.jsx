@@ -14,7 +14,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -49,7 +49,7 @@ export default function Login() {
       
     } catch (err) {
       setError(
-        err?.response?.data?.detail || "Invalid credentials. Please try again."
+        err?.response?.data?.detail || "Invalid Email/Username or Password."
       );
     } finally {
       setLoading(false);
@@ -118,18 +118,18 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit} style={styles.form}>
-            {/* Email */}
+            {/* Email/Username */}
             <div style={styles.fieldGroup}>
-              <label style={styles.label}>Email address</label>
+              <label style={styles.label}>Email/Username</label>
               <div style={styles.inputWrap}>
                 <FiMail size={16} style={styles.inputIcon} />
                 <input
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+                  name="identifier"
+                  type="text"
+                  autoComplete="username"
                   required
-                  placeholder="you@school.edu"
-                  value={form.email}
+                  placeholder="Email or Username"
+                  value={form.identifier}
                   onChange={handleChange}
                   style={styles.input}
                   onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
