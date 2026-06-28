@@ -311,7 +311,7 @@ export default function ObservationDetails() {
               }}>
                 <FiEdit2 size={16} /> Edit Observation
               </button>
-              <button onClick={() => navigate(`/children/${obs.child_id}/performance`)} style={{
+              <button onClick={() => navigate(`/child-performance/${obs.child_id}`)} style={{
                 width: "100%", padding: "13px 0", background: "#ECFDF5", border: "1px solid #A7F3D0",
                 borderRadius: 14, fontSize: 14, fontWeight: 600, color: "#059669",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8
