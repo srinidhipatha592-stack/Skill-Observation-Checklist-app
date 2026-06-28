@@ -76,7 +76,7 @@ def create_user(
     db.refresh(user)
 
     log_activity(
-        db=db, user_id=str(admin.id), role=admin.role,
+        db=db, user_id=str(admin.id), role=str(admin.role),
         action="User Created", module="User Management", request=request
     )
 
@@ -108,7 +108,7 @@ def update_user(
     db.refresh(user)
 
     log_activity(
-        db=db, user_id=str(admin.id), role=admin.role,
+        db=db, user_id=str(admin.id), role=str(admin.role),
         action="User Updated", module="User Management", request=request
     )
 
@@ -133,7 +133,7 @@ def delete_user(
     db.commit()
 
     log_activity(
-        db=db, user_id=str(admin.id), role=admin.role,
+        db=db, user_id=str(admin.id), role=str(admin.role),
         action="User Deleted", module="User Management", request=request
     )
 
