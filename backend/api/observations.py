@@ -196,11 +196,16 @@ def get_observation(
         if not assignment:
             raise HTTPException(status_code=403, detail="Not assigned to this student")
 
+    teacher = db.query(User).filter(User.id == observation.teacher_id).first()
+
     return {
         "id": str(observation.id),
         "child_id": str(observation.child_id),
+        "child_name": child.name if child else "Unknown Child",
         "teacher_id": str(observation.teacher_id),
+        "teacher_name": teacher.name if teacher else "Unknown Teacher",
         "skill": observation.skill,
+        "skill_name": observation.skill,
         "rating": observation.rating,
         "notes": observation.notes,
         "observation_date": observation.observation_date.isoformat() if observation.observation_date else None,
