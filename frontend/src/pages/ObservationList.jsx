@@ -93,7 +93,7 @@ export default function ObservationList() {
             <FiRefreshCw size={15} /> Refresh
           </button>
           {canEdit && (
-            <button onClick={() => navigate("/observations/add")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 22px", background: "#2563EB", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 600, color: "#fff", cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,.3)" }}>
+            <button onClick={() => navigate("/observations")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 22px", background: "#2563EB", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 600, color: "#fff", cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,.3)" }}>
               <FiPlus size={16} /> Add Observation
             </button>
           )}

@@ -2,7 +2,7 @@ import Sidebar from '../components/Sidebar';
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import {
   FiDownload, FiBarChart2, FiUsers, FiStar,
   FiTrendingUp, FiBookOpen, FiFilter, FiRefreshCw
@@ -22,14 +22,16 @@ export default function Reports() {
   const [children, setChildren] = useState([]);
   const [observations, setObservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedChild, setSelectedChild] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => { fetchAll(); }, []);
 
-  const fetchAll = async () => {
-    setLoading(true);
+  const fetchAll = async (isRefresh = false) => {
+    if (!isRefresh) setLoading(true);
+    else setIsRefreshing(true);
     try {
       const h = { Authorization: `Bearer ${token()}` };
       const [cRes, oRes] = await Promise.all([
@@ -38,7 +40,10 @@ export default function Reports() {
       ]);
       setChildren(cRes.data);
       setObservations(oRes.data);
-    } catch { /* silent */ } finally { setLoading(false); }
+    } catch { /* silent */ } finally { 
+      setLoading(false); 
+      setIsRefreshing(false);
+    }
   };
 
   // Filtered observations
@@ -87,7 +92,7 @@ export default function Reports() {
     doc.text("Skill Observation Report", 14, 20);
     doc.setFontSize(11);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
-    doc.autoTable({
+    autoTable(doc, {
       startY: 38,
       head: [["Child", "Skill", "Rating", "Date", "Notes"]],
       body: filtered.map((o) => [
@@ -128,34 +133,6 @@ export default function Reports() {
   return (
     <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <Sidebar />
-      <div style={{marginLeft: "var(--sidebar-width)", padding: "30px", fontFamily: "'Inter', sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
-
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#0F172A" }}>Reports</h1>
-          <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: 14 }}>Analytics and export for all observations</p>
-        </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          <button onClick={fetchAll}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-4px)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
-          style={{
-            display: "flex", alignItems: "center", gap: 8, padding: "10px 20px",
-            background: "#fff", cursor:"pointer", transition:"all .25s ease", border: "1px solid #E2E8F0", borderRadius: 12,
-            fontSize: 14, fontWeight: 500, color: "#475569", cursor: "pointer"
-          }}>
-            <FiRefreshCw size={15} /> Refresh
-          </button>
-          <button onClick={exportPDF} style={{
-            display: "flex", alignItems: "center", gap: 8, padding: "10px 22px",
-            background: "#2563EB", border: "none", borderRadius: 12,
-            fontSize: 14, fontWeight: 600, color: "#fff", cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(37,99,235,.3)"
           }}>
             <FiDownload size={15} /> Export PDF
           </button>
