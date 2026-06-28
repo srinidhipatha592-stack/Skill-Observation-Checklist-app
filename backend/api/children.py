@@ -67,20 +67,64 @@ def get_children(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    from models.observation import Observation
+    
     query = db.query(Child).filter(Child.deleted == False)
+    all_children = query.all()
 
-    if user.role == "parent":
-        return query.filter(Child.parent_email == user.email).all()
+    # Calculate global ranks for all children
+    all_obs = db.query(Observation).filter(Observation.deleted == False).all()
+    
+    child_stats = {}
+    for obs in all_obs:
+        if obs.child_id not in child_stats:
+            child_stats[obs.child_id] = {"total": 0, "count": 0}
+        child_stats[obs.child_id]["total"] += obs.rating
+        child_stats[obs.child_id]["count"] += 1
         
+    averages = []
+    for c in all_children:
+        c_id = c.id
+        if c_id in child_stats:
+            avg = child_stats[c_id]["total"] / child_stats[c_id]["count"]
+        else:
+            avg = 0
+        averages.append((c_id, avg))
+        
+    averages.sort(key=lambda x: x[1], reverse=True)
+    ranks = {c_id: rank + 1 for rank, (c_id, avg) in enumerate(averages)}
+    
+    if user.role == "parent":
+        filtered_children = [c for c in all_children if c.parent_email == user.email]
     elif user.role == "teacher":
         assignments = db.query(TeacherStudentAssignment).filter(TeacherStudentAssignment.teacher_id == user.id).all()
-        child_ids = [a.child_id for a in assignments]
-        return query.filter(Child.id.in_(child_ids)).all()
-        
+        child_ids = {a.child_id for a in assignments}
+        filtered_children = [c for c in all_children if c.id in child_ids]
     elif user.role == "admin":
-        return query.all()
-        
-    return []
+        filtered_children = all_children
+    else:
+        filtered_children = []
+
+    result = []
+    for c in filtered_children:
+        c_dict = {
+            "id": str(c.id),
+            "name": c.name,
+            "age": c.age,
+            "gender": c.gender,
+            "parent_name": c.parent_name,
+            "parent_email": c.parent_email,
+            "parent_phone": c.parent_phone,
+            "classroom": c.classroom,
+            "admission_date": c.admission_date.isoformat() if c.admission_date else None,
+            "allergies": c.allergies,
+            "medical_notes": c.medical_notes,
+            "global_rank": ranks.get(c.id, len(all_children)),
+            "global_avg": round(child_stats[c.id]["total"] / child_stats[c.id]["count"], 2) if c.id in child_stats else 0
+        }
+        result.append(c_dict)
+
+    return result
 
 
 @router.get("/{child_id}")

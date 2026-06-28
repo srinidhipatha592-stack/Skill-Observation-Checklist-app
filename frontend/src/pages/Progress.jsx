@@ -41,8 +41,9 @@ export default function Progress() {
   // Build child progress data
   const childProgress = children.map((child) => {
     const obs = observations.filter((o) => o.child_id === child.id || String(o.child_id) === String(child.id));
-    const avg = obs.length ? parseFloat((obs.reduce((s, o) => s + o.rating, 0) / obs.length).toFixed(2)) : 0;
-    return { ...child, avg, obsCount: obs.length };
+    const avg = child.global_avg !== undefined ? child.global_avg : (obs.length ? parseFloat((obs.reduce((s, o) => s + o.rating, 0) / obs.length).toFixed(2)) : 0);
+    const rank = child.global_rank !== undefined ? child.global_rank : 0;
+    return { ...child, avg, rank, obsCount: obs.length };
   }).sort((a, b) => b.avg - a.avg);
 
   const filtered = childProgress.filter((c) =>
@@ -61,7 +62,7 @@ export default function Progress() {
   const RankBadge = ({ rank }) => {
     if (rank > 3) return <span style={{ fontWeight: 700, color: "#64748B", fontSize: 15 }}>#{rank}</span>;
     const medals = ["🥇", "🥈", "🥉"];
-    return <span style={{ fontSize: 20 }}>{medals[rank - 1]}</span>;
+    return <span style={{ fontSize: 20 }}>{medals[rank - 1] || rank}</span>;
   };
 
   if (loading) return <PageLoader />;
@@ -157,7 +158,7 @@ export default function Progress() {
             </thead>
             <tbody>
               {filtered.map((child, i) => {
-                const rank = childProgress.findIndex((c) => c.id === child.id) + 1;
+                const rank = child.rank || (childProgress.findIndex((c) => c.id === child.id) + 1);
                 return (
                   <tr key={child.id} style={{ borderBottom: "1px solid #F1F5F9", background: rank <= 3 ? `${RANK_COLORS[rank - 1]}08` : "transparent" }}>
                     <td style={{ padding: "14px 16px" }}><RankBadge rank={rank} /></td>
