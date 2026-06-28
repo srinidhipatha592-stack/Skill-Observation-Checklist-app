@@ -81,7 +81,7 @@ export default function ActivityLogs() {
   return (
     <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <Sidebar />
-      <div style={{marginLeft: "var(--sidebar-width)", padding: "30px", fontFamily: "'Inter', sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
+      <div style={{marginLeft: "var(--sidebar-width)", padding: "30px", fontFamily: "'Inter', sans-serif", background: "#F8FAFC", minHeight: "100vh", transition: "margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>

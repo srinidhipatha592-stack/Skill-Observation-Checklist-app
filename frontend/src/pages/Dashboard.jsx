@@ -197,6 +197,7 @@ function Dashboard() {
           marginLeft: "var(--sidebar-width)",
           minHeight: "100vh",
           boxSizing: "border-box",
+          transition: "margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
         <Topbar
@@ -238,7 +239,7 @@ function Dashboard() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
+              gridTemplateColumns: role === "admin" ? "repeat(4, 1fr)" : "repeat(3, 1fr)",
               gap: "14px",
               marginBottom: "20px",
             }}
@@ -262,7 +263,7 @@ function Dashboard() {
                 value: stats.total_observations,
                 trend: stats.trends?.total_observations || "+ 5%",
               },
-              {
+              role === "admin" && {
                 to: "/user-management",
                 icon: <MdSchool size={20} />,
                 bg: "#ecfeff",
@@ -280,7 +281,7 @@ function Dashboard() {
                 value: stats.total_notifications,
                 trend: stats.trends?.total_notifications || "- 10%",
               },
-            ].map((s) => (
+            ].filter(Boolean).map((s) => (
               <Link key={s.label} to={s.to} style={{ textDecoration: "none" }}>
                 <div
                   style={{
