@@ -1,6 +1,6 @@
 import Sidebar from '../components/Sidebar';
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import {
   FiBookOpen, FiStar, FiUser, FiCalendar,
@@ -23,6 +23,8 @@ const Field = ({ label, children }) => (
   );
 export default function Observations() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = !!id;
 
   const [children, setChildren] = useState([]);
   const [skills] = useState([
@@ -47,7 +49,27 @@ export default function Observations() {
     observation_date: new Date().toISOString().split("T")[0],
   });
 
-  useEffect(() => { fetchOptions(); }, []);
+  useEffect(() => { 
+    fetchOptions(); 
+    if (isEdit) fetchObservation();
+  }, [id, isEdit]);
+
+  const fetchObservation = async () => {
+    try {
+      const res = await axios.get(`/api/observations/${id}`, { headers: { Authorization: `Bearer ${token()}` } });
+      const data = res.data;
+      setForm({
+        child_id: data.child_id,
+        teacher_id: data.teacher_id || String(localStorage.getItem("user_id") || ""),
+        skill: data.skill_name || data.skill || "",
+        rating: data.rating,
+        notes: data.notes || "",
+        observation_date: data.observation_date ? new Date(data.observation_date).toISOString().split('T')[0] : new Date().toISOString().split("T")[0],
+      });
+    } catch {
+      setError("Failed to load observation details.");
+    }
+  };
 
   const fetchOptions = async () => {
     setLoading(true);
@@ -77,7 +99,11 @@ export default function Observations() {
     setSubmitting(true);
     setError("");
     try {
-      await axios.post(`/api/observations/`, form, { headers: { Authorization: `Bearer ${token()}` } });
+      if (isEdit) {
+        await axios.put(`/api/observations/${id}`, form, { headers: { Authorization: `Bearer ${token()}` } });
+      } else {
+        await axios.post(`/api/observations/`, form, { headers: { Authorization: `Bearer ${token()}` } });
+      }
       setSuccess(true);
       setTimeout(() => navigate("/observation-list"), 1500);
     } catch (err) {
@@ -105,26 +131,6 @@ export default function Observations() {
   return (
     <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <Sidebar />
-      <div style={{marginLeft: "var(--sidebar-width)", padding: "30px", fontFamily: "'Inter', sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
-
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
-        <button onClick={() => navigate("/dashboard")} style={{
-          background: "#fff", border: "1px solid #E2E8F0", borderRadius: 12,
-          padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center",
-          gap: 8, color: "#475569", fontSize: 14, fontWeight: 500
-        }}>
-          <FiArrowLeft size={16} /> Back
-        </button>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#0F172A" }}>Record Observation</h1>
-          <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: 14 }}>Document a child's skill performance</p>
-        </div>
-      </div>
-
-      {error && (
-        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "14px 18px", marginBottom: 24, color: "#DC2626", fontSize: 14, display: "flex", alignItems: "center", gap: 10 }}>
-          <FiAlertCircle size={16} /> {error}
         </div>
       )}
 

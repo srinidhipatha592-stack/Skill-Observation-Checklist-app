@@ -150,6 +150,20 @@ function App() {
         />
 
         <Route
+          path="/observations/edit/:id"
+          element={
+            <RoleProtectedRoute
+              allowedRoles={[
+                "admin",
+                "teacher"
+              ]}
+            >
+              <Observations />
+            </RoleProtectedRoute>
+          }
+        />
+
+        <Route
           path="/observation-list"
           element={
             <ProtectedRoute>

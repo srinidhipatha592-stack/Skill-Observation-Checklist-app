@@ -176,7 +176,7 @@ export default function ObservationList() {
                       </td>
                       <td style={{ padding: "14px 16px" }}>
                         <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={() => navigate(`/observations/${obs.id}`)} title="View"
+                          <button onClick={() => navigate(`/observation/${obs.id}`)} title="View"
                             style={{ padding: "7px 10px", background: "#EFF6FF", border: "none", borderRadius: 10, cursor: "pointer", color: "#2563EB", display: "flex", alignItems: "center" }}>
                             <FiEye size={15} />
                           </button>
