@@ -26,8 +26,18 @@ def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(securi
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+def get_current_admin_or_teacher(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    token = credentials.credentials
+    payload = verify_access_token(token)
+    if not payload or payload.get("role") not in ["admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Admin or Teacher access required")
+    user = db.query(User).filter(User.id == payload.get("sub"), User.is_active == True, User.deleted == False).first()
+    if not user:
+        raise HTTPException(status_code=403, detail="Admin or Teacher access required")
+    return user
+
 @router.get("/")
-def get_users(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def get_users(current_user: User = Depends(get_current_admin_or_teacher), db: Session = Depends(get_db)):
     users = db.query(User).filter(User.deleted == False).all()
     return [
         {

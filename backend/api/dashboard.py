@@ -59,8 +59,10 @@ def dashboard_stats(user: User = Depends(get_current_user), db: Session = Depend
         assignments = db.query(TeacherStudentAssignment).filter(TeacherStudentAssignment.teacher_id == user.id).all()
         child_ids = [a.child_id for a in assignments]
         return {
-            "total_assigned_students": len(child_ids),
+            "total_children": len(child_ids),
             "total_observations": db.query(Observation).filter(Observation.created_by == user.id, Observation.deleted == False).count(),
+            "total_teachers": db.query(User).filter(User.role == "teacher", User.is_active == True, User.deleted == False).count(),
+            "total_notifications": db.query(Notification).count(),
         }
     elif user.role == "parent":
         children = db.query(Child).filter(Child.parent_email == user.email, Child.deleted == False).all()

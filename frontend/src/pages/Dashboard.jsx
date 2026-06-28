@@ -243,83 +243,44 @@ function Dashboard() {
               marginBottom: "20px",
             }}
           >
-            {(role === "admin"
-              ? [
-                  {
-                    to: "/children",
-                    icon: <MdPeopleAlt size={20} />,
-                    bg: "#eff6ff",
-                    color: "#2563eb",
-                    label: "Total Children",
-                    value: stats.total_children,
-                    trend: stats.trends?.total_children || "+ 12%",
-                  },
-                  {
-                    to: "/observation-list",
-                    icon: <MdFactCheck size={20} />,
-                    bg: "#eef2ff",
-                    color: "#6366f1",
-                    label: "Total Observations",
-                    value: stats.total_observations,
-                    trend: stats.trends?.total_observations || "+ 5%",
-                  },
-                  {
-                    to: "/user-management",
-                    icon: <MdSchool size={20} />,
-                    bg: "#ecfeff",
-                    color: "#0891b2",
-                    label: "Total Teachers",
-                    value: stats.total_teachers,
-                    trend: stats.trends?.total_teachers || "+ 2%",
-                  },
-                  {
-                    to: "/notifications",
-                    icon: <MdNotificationsNone size={20} />,
-                    bg: "#fef2f2",
-                    color: "#ef4444",
-                    label: "Total Notifications",
-                    value: stats.total_notifications,
-                    trend: stats.trends?.total_notifications || "- 10%",
-                  },
-                ]
-              : role === "teacher"
-              ? [
-                  {
-                    to: "/children",
-                    icon: <MdPeopleAlt size={20} />,
-                    bg: "#eff6ff",
-                    color: "#2563eb",
-                    label: "Assigned Students",
-                    value: stats.total_assigned_students,
-                  },
-                  {
-                    to: "/observation-list",
-                    icon: <MdFactCheck size={20} />,
-                    bg: "#eef2ff",
-                    color: "#6366f1",
-                    label: "Total Observations",
-                    value: stats.total_observations,
-                  }
-                ]
-              : [
-                  {
-                    to: "/parent-portal",
-                    icon: <MdPeopleAlt size={20} />,
-                    bg: "#eff6ff",
-                    color: "#2563eb",
-                    label: "Total Children",
-                    value: stats.total_children,
-                  },
-                  {
-                    to: "/reports",
-                    icon: <MdFactCheck size={20} />,
-                    bg: "#eef2ff",
-                    color: "#6366f1",
-                    label: "Total Observations",
-                    value: stats.total_observations,
-                  }
-                ]
-            ).map((s) => (
+            {[
+              {
+                to: "/children",
+                icon: <MdPeopleAlt size={20} />,
+                bg: "#eff6ff",
+                color: "#2563eb",
+                label: "Total Children",
+                value: stats.total_children,
+                trend: stats.trends?.total_children || "+ 12%",
+              },
+              {
+                to: "/observation-list",
+                icon: <MdFactCheck size={20} />,
+                bg: "#eef2ff",
+                color: "#6366f1",
+                label: "Total Observations",
+                value: stats.total_observations,
+                trend: stats.trends?.total_observations || "+ 5%",
+              },
+              {
+                to: "/user-management",
+                icon: <MdSchool size={20} />,
+                bg: "#ecfeff",
+                color: "#0891b2",
+                label: "Total Teachers",
+                value: stats.total_teachers,
+                trend: stats.trends?.total_teachers || "+ 2%",
+              },
+              {
+                to: "/notifications",
+                icon: <MdNotificationsNone size={20} />,
+                bg: "#fef2f2",
+                color: "#ef4444",
+                label: "Total Notifications",
+                value: stats.total_notifications,
+                trend: stats.trends?.total_notifications || "- 10%",
+              },
+            ].map((s) => (
               <Link key={s.label} to={s.to} style={{ textDecoration: "none" }}>
                 <div
                   style={{
@@ -803,14 +764,14 @@ function Dashboard() {
                 }}
               >
                 {[
-                  (role === "admin" || role === "teacher") && {
+                  {
                     to: "/add-child",
                     icon: <MdPersonAdd size={18} />,
                     bg: "#eff6ff",
                     color: "#2563eb",
                     label: "Add Child",
                   },
-                  (role === "admin" || role === "teacher") && {
+                  {
                     to: "/observations",
                     icon: <MdAdd size={18} />,
                     bg: "#f0fdf4",
@@ -831,14 +792,14 @@ function Dashboard() {
                     color: "#ea580c",
                     label: "View Progress",
                   },
-                  role === "admin" && {
+                  {
                     to: "/notifications",
                     icon: <MdNotificationsNone size={18} />,
                     bg: "#fef2f2",
                     color: "#ef4444",
                     label: "View Notifications",
                   },
-                ].filter(Boolean).map((a) => (
+                ].map((a) => (
                   <Link
                     key={a.label}
                     to={a.to}

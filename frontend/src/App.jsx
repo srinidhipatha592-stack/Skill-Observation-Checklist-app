@@ -238,7 +238,8 @@ function App() {
           element={
             <RoleProtectedRoute
               allowedRoles={[
-                "admin"
+                "admin",
+                "teacher"
               ]}
             >
               <Notifications />
@@ -297,7 +298,8 @@ function App() {
           element={
             <RoleProtectedRoute
               allowedRoles={[
-                "admin"
+                "admin",
+                "teacher"
               ]}
             >
               <UserManagement />
