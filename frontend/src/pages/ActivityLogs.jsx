@@ -21,7 +21,10 @@ const ACTION_CONFIG = {
 
 const getConfig = (action = "") => {
   const k = action.toLowerCase();
-  return ACTION_CONFIG[k] || ACTION_CONFIG.default;
+  for (const [key, val] of Object.entries(ACTION_CONFIG)) {
+    if (key !== "default" && k.includes(key)) return val;
+  }
+  return ACTION_CONFIG.default;
 };
 
 const PAGE_SIZE = 20;
@@ -61,8 +64,15 @@ export default function ActivityLogs() {
   // Summary counts
   const summaryCounts = {};
   logs.forEach((l) => {
-    const k = l.action?.toLowerCase() || "other";
-    summaryCounts[k] = (summaryCounts[k] || 0) + 1;
+    let matchedKey = "default";
+    const k = (l.action || "").toLowerCase();
+    for (const [key] of Object.entries(ACTION_CONFIG)) {
+      if (key !== "default" && k.includes(key)) {
+        matchedKey = key;
+        break;
+      }
+    }
+    summaryCounts[matchedKey] = (summaryCounts[matchedKey] || 0) + 1;
   });
 
   if (loading) return <PageLoader />;
