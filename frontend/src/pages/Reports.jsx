@@ -133,6 +133,35 @@ export default function Reports() {
   return (
     <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <Sidebar />
+      <div style={{marginLeft: "var(--sidebar-width)", padding: "30px", fontFamily: "'Inter', sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
+
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#0F172A" }}>Reports</h1>
+          <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: 14 }}>Analytics and export for all observations</p>
+        </div>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button onClick={() => fetchAll(true)}
+          disabled={isRefreshing}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-4px)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+          }}
+          style={{
+            display: "flex", alignItems: "center", gap: 8, padding: "10px 20px",
+            background: "#fff", cursor:"pointer", transition:"all .25s ease", border: "1px solid #E2E8F0", borderRadius: 12,
+            fontSize: 14, fontWeight: 500, color: "#475569", opacity: isRefreshing ? 0.7 : 1
+          }}>
+            <FiRefreshCw size={15} /> {isRefreshing ? "Refreshing..." : "Refresh"}
+          </button>
+          <button onClick={exportPDF} style={{
+            display: "flex", alignItems: "center", gap: 8, padding: "10px 22px",
+            background: "#2563EB", border: "none", borderRadius: 12,
+            fontSize: 14, fontWeight: 600, color: "#fff", cursor: "pointer",
+            boxShadow: "0 4px 14px rgba(37,99,235,.3)"
           }}>
             <FiDownload size={15} /> Export PDF
           </button>

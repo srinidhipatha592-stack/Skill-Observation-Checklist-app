@@ -2,7 +2,7 @@ import Sidebar from '../components/Sidebar';
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import {
   FiCalendar, FiDownload, FiBarChart2, FiStar,
   FiUsers, FiChevronLeft, FiChevronRight, FiBookOpen
@@ -85,7 +85,7 @@ export default function MonthlyReports() {
     doc.text(`Monthly Report — ${MONTHS[selectedMonth]} ${selectedYear}`, 14, 20);
     doc.setFontSize(11);
     doc.text(`Total Observations: ${monthlyObs.length}  |  Average: ${overallAvg}/5`, 14, 30);
-    doc.autoTable({
+    autoTable(doc, {
       startY: 38,
       head: [["Child", "Observations", "Average Rating"]],
       body: childSummary.map((c) => [c.name, c.obs, c.avg !== null ? `${c.avg}/5` : "—"]),
