@@ -56,7 +56,8 @@ export default function Observations() {
 
   const fetchObservation = async () => {
     try {
-      const res = await axios.get(`/api/observations/${id}`, { headers: { Authorization: `Bearer ${token()}` } });
+      const h = { Authorization: `Bearer ${token()}` };
+      const res = await axios.get(`/api/observations/${id}`, { headers: h });
       const data = res.data;
       setForm({
         child_id: data.child_id,
@@ -131,6 +132,26 @@ export default function Observations() {
   return (
     <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <Sidebar />
+      <div style={{marginLeft: "var(--sidebar-width)", padding: "30px", fontFamily: "'Inter', sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
+        <button onClick={() => navigate("/dashboard")} style={{
+          background: "#fff", border: "1px solid #E2E8F0", borderRadius: 12,
+          padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center",
+          gap: 8, color: "#475569", fontSize: 14, fontWeight: 500
+        }}>
+          <FiArrowLeft size={16} /> Back
+        </button>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#0F172A" }}>{isEdit ? "Edit Observation" : "Record Observation"}</h1>
+          <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: 14 }}>{isEdit ? "Update this observation" : "Document a child's skill performance"}</p>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "14px 18px", marginBottom: 24, color: "#DC2626", fontSize: 14, display: "flex", alignItems: "center", gap: 10 }}>
+          <FiAlertCircle size={16} /> {error}
         </div>
       )}
 

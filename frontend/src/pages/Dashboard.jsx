@@ -765,7 +765,7 @@ function Dashboard() {
               >
                 {[
                   {
-                    to: "/children",
+                    to: "/add-child",
                     icon: <MdPersonAdd size={18} />,
                     bg: "#eff6ff",
                     color: "#2563eb",
