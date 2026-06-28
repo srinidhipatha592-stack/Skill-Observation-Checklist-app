@@ -265,6 +265,7 @@ function Dashboard() {
               },
               role === "admin" && {
                 to: "/user-management",
+                state: { defaultFilter: "teacher" },
                 icon: <MdSchool size={20} />,
                 bg: "#ecfeff",
                 color: "#0891b2",
@@ -282,7 +283,7 @@ function Dashboard() {
                 trend: stats.trends?.total_notifications || "- 10%",
               },
             ].filter(Boolean).map((s) => (
-              <Link key={s.label} to={s.to} style={{ textDecoration: "none" }}>
+              <Link key={s.label} to={s.to} state={s.state} style={{ textDecoration: "none" }}>
                 <div
                   style={{
                     ...card,

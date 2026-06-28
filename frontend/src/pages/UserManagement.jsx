@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "../api/axios";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import { MdEdit, MdDelete, MdPersonAdd, MdSearch } from "react-icons/md";
 
 function UserManagement() {
+  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +16,7 @@ function UserManagement() {
   const [role, setRole] = useState("teacher");
 
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState(location.state?.defaultFilter || "all");
   const [editingUserId, setEditingUserId] = useState(null);
 
   useEffect(() => {
